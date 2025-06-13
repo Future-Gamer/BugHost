@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Plus, Bell, User } from "lucide-react";
 
 interface TopNavProps {
-  selectedProject: string | null;
+  selectedProject: {id: string; name: string} | null;
   onCreateProject: () => void;
   onCreateTicket: () => void;
 }
@@ -25,7 +25,7 @@ export const TopNav = ({ selectedProject, onCreateProject, onCreateTicket }: Top
           
           {selectedProject && (
             <Badge variant="secondary" className="px-3 py-1">
-              Project: {selectedProject}
+              Project: {selectedProject.name}
             </Badge>
           )}
         </div>

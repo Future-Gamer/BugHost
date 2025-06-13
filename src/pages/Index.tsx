@@ -8,17 +8,22 @@ import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 import { CreateTicketModal } from "@/components/tickets/CreateTicketModal";
 
 const Index = () => {
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<{id: string; name: string} | null>(null);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showCreateTicket, setShowCreateTicket] = useState(false);
   const [currentView, setCurrentView] = useState<'projects' | 'board'>('projects');
+
+  const handleSelectProject = (projectId: string, projectName: string) => {
+    setSelectedProject({ id: projectId, name: projectName });
+    setCurrentView('board');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex w-full">
       <Sidebar 
         currentView={currentView}
         onViewChange={setCurrentView}
-        selectedProject={selectedProject}
+        selectedProject={selectedProject?.id || null}
         onCreateProject={() => setShowCreateProject(true)}
         onCreateTicket={() => setShowCreateTicket(true)}
       />
@@ -32,15 +37,11 @@ const Index = () => {
         
         <main className="flex-1 p-6">
           {currentView === 'projects' ? (
-            <ProjectList 
-              onSelectProject={(projectId) => {
-                setSelectedProject(projectId);
-                setCurrentView('board');
-              }}
-            />
+            <ProjectList onSelectProject={handleSelectProject} />
           ) : (
             <TicketBoard 
-              projectId={selectedProject}
+              projectId={selectedProject?.id || null}
+              projectName={selectedProject?.name}
               onCreateTicket={() => setShowCreateTicket(true)}
             />
           )}
@@ -55,7 +56,7 @@ const Index = () => {
       <CreateTicketModal 
         isOpen={showCreateTicket}
         onClose={() => setShowCreateTicket(false)}
-        projectId={selectedProject}
+        projectId={selectedProject?.id || null}
       />
     </div>
   );

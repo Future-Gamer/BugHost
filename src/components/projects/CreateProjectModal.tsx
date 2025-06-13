@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { useCreateProject } from "@/hooks/useProjects";
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -17,42 +17,26 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
     name: '',
     description: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  
+  const createProject = useCreateProject();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast({
-        title: "Error",
-        description: "Project name is required",
-        variant: "destructive"
-      });
       return;
     }
 
-    setIsLoading(true);
-    
     try {
-      // TODO: Integrate with Supabase
-      console.log('Creating project:', formData);
-      
-      toast({
-        title: "Success",
-        description: "Project created successfully"
+      await createProject.mutateAsync({
+        name: formData.name,
+        description: formData.description || null,
       });
       
       setFormData({ name: '', description: '' });
       onClose();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create project",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Error creating project:', error);
     }
   };
 
@@ -90,8 +74,8 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Project'}
+            <Button type="submit" disabled={createProject.isPending}>
+              {createProject.isPending ? 'Creating...' : 'Create Project'}
             </Button>
           </div>
         </form>

@@ -1,55 +1,52 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FolderOpen, Users, Bug, Calendar, MoreHorizontal } from "lucide-react";
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  status: 'active' | 'archived';
-  memberCount: number;
-  ticketCount: number;
-  createdAt: string;
-}
+import { useProjects } from "@/hooks/useProjects";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProjectListProps {
-  onSelectProject: (projectId: string) => void;
+  onSelectProject: (projectId: string, projectName: string) => void;
 }
 
 export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
-  // Mock data - this will be replaced with Supabase data
-  const [projects] = useState<Project[]>([
-    {
-      id: 'proj-1',
-      name: 'Bug Tracker App',
-      description: 'Main application for tracking bugs and issues across our platform',
-      status: 'active',
-      memberCount: 5,
-      ticketCount: 23,
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 'proj-2',
-      name: 'Mobile App v2.0',
-      description: 'Next generation mobile application with enhanced features',
-      status: 'active',
-      memberCount: 8,
-      ticketCount: 41,
-      createdAt: '2024-02-01'
-    },
-    {
-      id: 'proj-3',
-      name: 'Legacy System Migration',
-      description: 'Migration project for moving from old infrastructure',
-      status: 'archived',
-      memberCount: 3,
-      ticketCount: 156,
-      createdAt: '2023-11-20'
-    }
-  ]);
+  const { data: projects, isLoading, error } = useProjects();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+            <p className="text-gray-600 mt-1">Manage your projects and track issues</p>
+          </div>
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+            <p className="text-gray-600 mt-1">Manage your projects and track issues</p>
+          </div>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-red-600">Error loading projects. Please try again.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -59,16 +56,16 @@ export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
           <p className="text-gray-600 mt-1">Manage your projects and track issues</p>
         </div>
         <Badge variant="secondary" className="px-3 py-1">
-          {projects.length} Projects
+          {projects?.length || 0} Projects
         </Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
+        {projects?.map((project) => (
           <Card 
             key={project.id} 
             className="hover:shadow-lg transition-shadow cursor-pointer group"
-            onClick={() => onSelectProject(project.id)}
+            onClick={() => onSelectProject(project.id, project.name)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -102,16 +99,16 @@ export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-1">
                     <Users className="h-4 w-4" />
-                    <span>{project.memberCount}</span>
+                    <span>5</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Bug className="h-4 w-4" />
-                    <span>{project.ticketCount}</span>
+                    <span>0</span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                  <span>{new Date(project.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </CardContent>

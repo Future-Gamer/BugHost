@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCreateTicket } from "@/hooks/useTickets";
 import { useToast } from "@/hooks/use-toast";
 
 interface CreateTicketModalProps {
@@ -20,41 +21,34 @@ export const CreateTicketModal = ({ isOpen, onClose, projectId }: CreateTicketMo
     description: '',
     type: 'bug' as 'bug' | 'feature' | 'task',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
-    assignee: ''
+    assignee: '',
+    reporter: 'Current User'
   });
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const createTicket = useCreateTicket();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim()) {
+    if (!formData.title.trim() || !projectId) {
       toast({
         title: "Error",
-        description: "Ticket title is required",
+        description: "Title is required and a project must be selected",
         variant: "destructive"
       });
       return;
     }
 
-    if (!projectId) {
-      toast({
-        title: "Error",
-        description: "No project selected",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    
     try {
-      // TODO: Integrate with Supabase
-      console.log('Creating ticket:', { ...formData, projectId });
-      
-      toast({
-        title: "Success",
-        description: "Ticket created successfully"
+      await createTicket.mutateAsync({
+        title: formData.title,
+        description: formData.description || null,
+        type: formData.type,
+        priority: formData.priority,
+        assignee: formData.assignee || null,
+        reporter: formData.reporter,
+        project_id: projectId,
       });
       
       setFormData({
@@ -62,19 +56,30 @@ export const CreateTicketModal = ({ isOpen, onClose, projectId }: CreateTicketMo
         description: '',
         type: 'bug',
         priority: 'medium',
-        assignee: ''
+        assignee: '',
+        reporter: 'Current User'
       });
       onClose();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create ticket",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Error creating ticket:', error);
     }
   };
+
+  if (!projectId) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Ticket</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-8">
+            <p className="text-gray-600">Please select a project first</p>
+            <Button className="mt-4" onClick={onClose}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -99,18 +104,18 @@ export const CreateTicketModal = ({ isOpen, onClose, projectId }: CreateTicketMo
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Describe the issue or task"
+              placeholder="Enter ticket description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               rows={3}
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
-              <Select
-                value={formData.type}
+              <Select 
+                value={formData.type} 
                 onValueChange={(value: 'bug' | 'feature' | 'task') => 
                   setFormData(prev => ({ ...prev, type: value }))
                 }
@@ -119,17 +124,17 @@ export const CreateTicketModal = ({ isOpen, onClose, projectId }: CreateTicketMo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bug">🐛 Bug</SelectItem>
-                  <SelectItem value="feature">⚡ Feature</SelectItem>
-                  <SelectItem value="task">✅ Task</SelectItem>
+                  <SelectItem value="bug">Bug</SelectItem>
+                  <SelectItem value="feature">Feature</SelectItem>
+                  <SelectItem value="task">Task</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={formData.priority}
+              <Select 
+                value={formData.priority} 
                 onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') => 
                   setFormData(prev => ({ ...prev, priority: value }))
                 }
@@ -138,31 +143,43 @@ export const CreateTicketModal = ({ isOpen, onClose, projectId }: CreateTicketMo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">🟢 Low</SelectItem>
-                  <SelectItem value="medium">🟡 Medium</SelectItem>
-                  <SelectItem value="high">🟠 High</SelectItem>
-                  <SelectItem value="urgent">🔴 Urgent</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="assignee">Assignee (Optional)</Label>
-            <Input
-              id="assignee"
-              placeholder="Enter assignee name"
-              value={formData.assignee}
-              onChange={(e) => setFormData(prev => ({ ...prev, assignee: e.target.value }))}
-            />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="assignee">Assignee</Label>
+              <Input
+                id="assignee"
+                placeholder="Enter assignee name"
+                value={formData.assignee}
+                onChange={(e) => setFormData(prev => ({ ...prev, assignee: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reporter">Reporter</Label>
+              <Input
+                id="reporter"
+                value={formData.reporter}
+                onChange={(e) => setFormData(prev => ({ ...prev, reporter: e.target.value }))}
+                required
+              />
+            </div>
           </div>
           
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !projectId}>
-              {isLoading ? 'Creating...' : 'Create Ticket'}
+            <Button type="submit" disabled={createTicket.isPending}>
+              {createTicket.isPending ? 'Creating...' : 'Create Ticket'}
             </Button>
           </div>
         </form>
