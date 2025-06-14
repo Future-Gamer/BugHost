@@ -9,6 +9,147 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      issues: {
+        Row: {
+          assignee: string | null
+          assignee_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          priority: Database["public"]["Enums"]["ticket_priority"]
+          project_id: string
+          reporter: string
+          reporter_id: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          title: string
+          type: Database["public"]["Enums"]["ticket_type"]
+          updated_at: string
+        }
+        Insert: {
+          assignee?: string | null
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id: string
+          reporter: string
+          reporter_id?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          title: string
+          type?: Database["public"]["Enums"]["ticket_type"]
+          updated_at?: string
+        }
+        Update: {
+          assignee?: string | null
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id?: string
+          reporter?: string
+          reporter_id?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["ticket_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issues_assignee_id_fkey"
+            columns: ["assignee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
@@ -36,52 +177,79 @@ export type Database = {
         }
         Relationships: []
       }
-      tickets: {
+      team_members: {
         Row: {
-          assignee: string | null
+          id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["user_role"]
+          status: Database["public"]["Enums"]["team_member_status"]
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          status?: Database["public"]["Enums"]["team_member_status"]
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          status?: Database["public"]["Enums"]["team_member_status"]
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
           created_at: string
+          created_by: string
           description: string | null
           id: string
-          priority: Database["public"]["Enums"]["ticket_priority"]
-          project_id: string
-          reporter: string
-          status: Database["public"]["Enums"]["ticket_status"]
-          title: string
-          type: Database["public"]["Enums"]["ticket_type"]
+          name: string
           updated_at: string
         }
         Insert: {
-          assignee?: string | null
           created_at?: string
+          created_by: string
           description?: string | null
           id?: string
-          priority?: Database["public"]["Enums"]["ticket_priority"]
-          project_id: string
-          reporter: string
-          status?: Database["public"]["Enums"]["ticket_status"]
-          title: string
-          type?: Database["public"]["Enums"]["ticket_type"]
+          name: string
           updated_at?: string
         }
         Update: {
-          assignee?: string | null
           created_at?: string
+          created_by?: string
           description?: string | null
           id?: string
-          priority?: Database["public"]["Enums"]["ticket_priority"]
-          project_id?: string
-          reporter?: string
-          status?: Database["public"]["Enums"]["ticket_status"]
-          title?: string
-          type?: Database["public"]["Enums"]["ticket_type"]
+          name?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "tickets_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: "teams_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "projects"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -94,10 +262,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      issue_priority: "low" | "medium" | "high" | "urgent"
+      issue_status: "todo" | "inprogress" | "done"
+      issue_type: "bug" | "feature" | "task"
       project_status: "active" | "archived"
+      team_member_status: "active" | "inactive" | "pending"
       ticket_priority: "low" | "medium" | "high" | "urgent"
       ticket_status: "todo" | "inprogress" | "done"
       ticket_type: "bug" | "feature" | "task"
+      user_role: "admin" | "manager" | "developer" | "tester"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -213,10 +386,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      issue_priority: ["low", "medium", "high", "urgent"],
+      issue_status: ["todo", "inprogress", "done"],
+      issue_type: ["bug", "feature", "task"],
       project_status: ["active", "archived"],
+      team_member_status: ["active", "inactive", "pending"],
       ticket_priority: ["low", "medium", "high", "urgent"],
       ticket_status: ["todo", "inprogress", "done"],
       ticket_type: ["bug", "feature", "task"],
+      user_role: ["admin", "manager", "developer", "tester"],
     },
   },
 } as const

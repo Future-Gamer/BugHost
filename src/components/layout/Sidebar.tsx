@@ -2,15 +2,11 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
-  Home, 
   FolderOpen, 
-  Settings, 
   Plus, 
   ChevronLeft,
   ChevronRight,
-  Bug,
-  Users,
-  BarChart3
+  Bug
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,7 +15,7 @@ interface SidebarProps {
   onViewChange: (view: 'projects' | 'board') => void;
   selectedProject: string | null;
   onCreateProject: () => void;
-  onCreateTicket: () => void;
+  onCreateIssue: () => void;
 }
 
 export const Sidebar = ({ 
@@ -27,7 +23,7 @@ export const Sidebar = ({
   onViewChange, 
   selectedProject,
   onCreateProject,
-  onCreateTicket
+  onCreateIssue
 }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -104,13 +100,13 @@ export const Sidebar = ({
           
           {selectedProject && (
             <Button
-              onClick={onCreateTicket}
+              onClick={onCreateIssue}
               variant="outline"
               className="w-full justify-start"
               size="sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              New Ticket
+              New Issue
             </Button>
           )}
         </div>

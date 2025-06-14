@@ -2,15 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Bell, User } from "lucide-react";
+import { Search, Plus } from "lucide-react";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 
 interface TopNavProps {
   selectedProject: {id: string; name: string} | null;
   onCreateProject: () => void;
-  onCreateTicket: () => void;
+  onCreateIssue: () => void;
 }
 
-export const TopNav = ({ selectedProject, onCreateProject, onCreateTicket }: TopNavProps) => {
+export const TopNav = ({ selectedProject, onCreateProject, onCreateIssue }: TopNavProps) => {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -18,7 +20,7 @@ export const TopNav = ({ selectedProject, onCreateProject, onCreateTicket }: Top
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search tickets, projects..."
+              placeholder="Search issues, projects..."
               className="pl-10 w-96"
             />
           </div>
@@ -37,19 +39,14 @@ export const TopNav = ({ selectedProject, onCreateProject, onCreateTicket }: Top
           </Button>
           
           {selectedProject && (
-            <Button size="sm" onClick={onCreateTicket}>
+            <Button size="sm" onClick={onCreateIssue}>
               <Plus className="h-4 w-4 mr-1" />
-              Ticket
+              Issue
             </Button>
           )}
 
-          <Button variant="ghost" size="sm">
-            <Bell className="h-4 w-4" />
-          </Button>
-          
-          <Button variant="ghost" size="sm">
-            <User className="h-4 w-4" />
-          </Button>
+          <NotificationDropdown />
+          <ProfileDropdown />
         </div>
       </div>
     </header>

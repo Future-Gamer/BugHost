@@ -3,14 +3,14 @@ import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { ProjectList } from "@/components/projects/ProjectList";
-import { TicketBoard } from "@/components/tickets/TicketBoard";
+import { IssueBoard } from "@/components/issues/IssueBoard";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
-import { CreateTicketModal } from "@/components/tickets/CreateTicketModal";
+import { CreateIssueModal } from "@/components/issues/CreateIssueModal";
 
 const Index = () => {
   const [selectedProject, setSelectedProject] = useState<{id: string; name: string} | null>(null);
   const [showCreateProject, setShowCreateProject] = useState(false);
-  const [showCreateTicket, setShowCreateTicket] = useState(false);
+  const [showCreateIssue, setShowCreateIssue] = useState(false);
   const [currentView, setCurrentView] = useState<'projects' | 'board'>('projects');
 
   const handleSelectProject = (projectId: string, projectName: string) => {
@@ -25,24 +25,24 @@ const Index = () => {
         onViewChange={setCurrentView}
         selectedProject={selectedProject?.id || null}
         onCreateProject={() => setShowCreateProject(true)}
-        onCreateTicket={() => setShowCreateTicket(true)}
+        onCreateIssue={() => setShowCreateIssue(true)}
       />
       
       <div className="flex-1 flex flex-col">
         <TopNav 
           selectedProject={selectedProject}
           onCreateProject={() => setShowCreateProject(true)}
-          onCreateTicket={() => setShowCreateTicket(true)}
+          onCreateIssue={() => setShowCreateIssue(true)}
         />
         
         <main className="flex-1 p-6">
           {currentView === 'projects' ? (
             <ProjectList onSelectProject={handleSelectProject} />
           ) : (
-            <TicketBoard 
+            <IssueBoard 
               projectId={selectedProject?.id || null}
               projectName={selectedProject?.name}
-              onCreateTicket={() => setShowCreateTicket(true)}
+              onCreateIssue={() => setShowCreateIssue(true)}
             />
           )}
         </main>
@@ -53,9 +53,9 @@ const Index = () => {
         onClose={() => setShowCreateProject(false)}
       />
 
-      <CreateTicketModal 
-        isOpen={showCreateTicket}
-        onClose={() => setShowCreateTicket(false)}
+      <CreateIssueModal 
+        isOpen={showCreateIssue}
+        onClose={() => setShowCreateIssue(false)}
         projectId={selectedProject?.id || null}
       />
     </div>
