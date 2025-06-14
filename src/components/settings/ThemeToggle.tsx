@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, Monitor } from 'lucide-react';
 
 interface ThemeToggleProps {
   theme: string;
@@ -10,31 +9,26 @@ interface ThemeToggleProps {
 }
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, onThemeChange }) => {
-  const isDark = theme === 'dark';
-
-  const handleToggle = (checked: boolean) => {
-    onThemeChange(checked ? 'dark' : 'light');
-  };
+  const themes = [
+    { value: 'light', label: 'Light', icon: Sun },
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'System', icon: Monitor },
+  ];
 
   return (
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2">
-        <Sun className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-        <Label htmlFor="theme-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Light
-        </Label>
-      </div>
-      <Switch
-        id="theme-toggle"
-        checked={isDark}
-        onCheckedChange={handleToggle}
-      />
-      <div className="flex items-center space-x-2">
-        <Moon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-        <Label htmlFor="theme-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Dark
-        </Label>
-      </div>
+    <div className="flex items-center space-x-2 p-1 bg-muted rounded-lg">
+      {themes.map(({ value, label, icon: Icon }) => (
+        <Button
+          key={value}
+          variant={theme === value ? "default" : "ghost"}
+          size="sm"
+          onClick={() => onThemeChange(value)}
+          className="gap-2"
+        >
+          <Icon className="h-4 w-4" />
+          {label}
+        </Button>
+      ))}
     </div>
   );
 };

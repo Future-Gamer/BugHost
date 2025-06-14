@@ -6,9 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Home, Bell, Shield, User, Palette, Globe, Download, Trash2, Key } from 'lucide-react';
+import { ArrowLeft, Home, Bell, Shield, Palette, Globe, Download, Trash2, Key, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserPreferences, useCreateUserPreferences, useUpdateUserPreferences } from '@/hooks/useUserPreferences';
 import { ThemeToggle } from '@/components/settings/ThemeToggle';
@@ -36,6 +35,20 @@ const Settings = () => {
           theme,
         });
       }
+      
+      // Apply theme immediately
+      document.documentElement.classList.remove('light', 'dark');
+      if (theme === 'system') {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.classList.add(systemTheme);
+      } else {
+        document.documentElement.classList.add(theme);
+      }
+      
+      toast({
+        title: "Theme updated",
+        description: `Theme changed to ${theme}`,
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -60,6 +73,11 @@ const Settings = () => {
           email_notifications: emailNotifications,
         });
       }
+      
+      toast({
+        title: "Notifications updated",
+        description: `Email notifications ${emailNotifications ? 'enabled' : 'disabled'}`,
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -67,6 +85,39 @@ const Settings = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleExportData = () => {
+    toast({
+      title: "Data export started",
+      description: "Your data export will be available for download shortly",
+    });
+    // In a real app, this would trigger a data export process
+  };
+
+  const handleDeleteAccount = () => {
+    toast({
+      title: "Account deletion",
+      description: "This feature requires additional confirmation steps",
+      variant: "destructive",
+    });
+    // In a real app, this would open a confirmation dialog
+  };
+
+  const handleChangePassword = () => {
+    toast({
+      title: "Password change",
+      description: "Redirecting to password change form...",
+    });
+    // In a real app, this would redirect to a password change form
+  };
+
+  const handleEnable2FA = () => {
+    toast({
+      title: "Two-Factor Authentication",
+      description: "2FA setup will be available in the next update",
+    });
+    // In a real app, this would open 2FA setup
   };
 
   // Apply theme to document
@@ -83,7 +134,7 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
@@ -101,14 +152,17 @@ const Settings = () => {
               </Link>
             </div>
           </div>
-          <div className="text-center py-8">Loading settings...</div>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin mr-2" />
+            <span>Loading settings...</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
@@ -129,8 +183,8 @@ const Settings = () => {
         
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your application settings and preferences</p>
+            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+            <p className="text-muted-foreground mt-1">Manage your application settings and preferences</p>
           </div>
           
           <div className="grid gap-6">
@@ -150,7 +204,7 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Theme</Label>
                     <div className="text-sm text-muted-foreground">
-                      Choose between light and dark mode
+                      Choose between light, dark, or system theme
                     </div>
                   </div>
                   <ThemeToggle
@@ -177,6 +231,16 @@ const Settings = () => {
                       <SelectItem value="de">Deutsch</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Compact Mode</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Use a more compact interface layout
+                    </div>
+                  </div>
+                  <Switch />
                 </div>
               </CardContent>
             </Card>
@@ -220,7 +284,7 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Issue Updates</Label>
                     <div className="text-sm text-muted-foreground">
-                      Notify when issues are updated
+                      Notify when issues are updated or assigned
                     </div>
                   </div>
                   <Switch defaultChecked />
@@ -230,10 +294,20 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Team Invitations</Label>
                     <div className="text-sm text-muted-foreground">
-                      Notify when invited to teams
+                      Notify when invited to teams or projects
                     </div>
                   </div>
                   <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Weekly Summary</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Receive weekly activity summaries
+                    </div>
+                  </div>
+                  <Switch />
                 </div>
               </CardContent>
             </Card>
@@ -254,10 +328,10 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Two-Factor Authentication</Label>
                     <div className="text-sm text-muted-foreground">
-                      Add an extra layer of security
+                      Add an extra layer of security to your account
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleEnable2FA}>
                     <Key className="h-4 w-4 mr-2" />
                     Enable 2FA
                   </Button>
@@ -291,8 +365,20 @@ const Settings = () => {
                       Change your account password
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleChangePassword}>
                     Change Password
+                  </Button>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Login History</Label>
+                    <div className="text-sm text-muted-foreground">
+                      View recent login activity
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View History
                   </Button>
                 </div>
               </CardContent>
@@ -314,10 +400,10 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Data Export</Label>
                     <div className="text-sm text-muted-foreground">
-                      Download a copy of your data
+                      Download a copy of all your data
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleExportData}>
                     <Download className="h-4 w-4 mr-2" />
                     Export Data
                   </Button>
@@ -325,9 +411,9 @@ const Settings = () => {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Analytics</Label>
+                    <Label className="text-base">Usage Analytics</Label>
                     <div className="text-sm text-muted-foreground">
-                      Help improve our service with usage analytics
+                      Help improve our service with anonymous usage data
                     </div>
                   </div>
                   <Switch defaultChecked />
@@ -337,18 +423,87 @@ const Settings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base">Marketing Communications</Label>
                     <div className="text-sm text-muted-foreground">
-                      Receive updates about new features
+                      Receive updates about new features and products
                     </div>
                   </div>
                   <Switch />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Profile Visibility</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Control who can see your profile information
+                    </div>
+                  </div>
+                  <Select defaultValue="team">
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select visibility" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="team">Team Only</SelectItem>
+                      <SelectItem value="private">Private</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Integrations & API */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="h-5 w-5" />
+                  Integrations & API
+                </CardTitle>
+                <CardDescription>
+                  Manage third-party integrations and API access
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">API Keys</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Generate and manage API keys for integrations
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Manage API Keys
+                  </Button>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Webhook URLs</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Configure webhooks for external services
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    Configure Webhooks
+                  </Button>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Connected Apps</Label>
+                    <div className="text-sm text-muted-foreground">
+                      Manage connected third-party applications
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Connected Apps
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Danger Zone */}
-            <Card className="border-red-200 dark:border-red-800">
+            <Card className="border-destructive/50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <CardTitle className="flex items-center gap-2 text-destructive">
                   <Trash2 className="h-5 w-5" />
                   Danger Zone
                 </CardTitle>
@@ -357,14 +512,14 @@ const Settings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
                   <div className="space-y-0.5">
                     <Label className="text-base">Delete Account</Label>
                     <div className="text-sm text-muted-foreground">
                       Permanently delete your account and all associated data
                     </div>
                   </div>
-                  <Button variant="destructive" size="sm">
+                  <Button variant="destructive" size="sm" onClick={handleDeleteAccount}>
                     Delete Account
                   </Button>
                 </div>
