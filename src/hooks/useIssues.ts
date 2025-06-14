@@ -23,14 +23,14 @@ export const useIssues = (projectId: string | null) => {
         .from('issues')
         .select(`
           *,
-          assignee_profile:assignee_id(first_name, last_name),
-          reporter_profile:reporter_id(first_name, last_name)
+          assignee_profile:profiles!issues_assignee_id_fkey(first_name, last_name),
+          reporter_profile:profiles!issues_reporter_id_fkey(first_name, last_name)
         `)
         .eq('project_id', projectId)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as IssueWithProfiles[];
+      return (data || []) as IssueWithProfiles[];
     },
     enabled: !!projectId,
   });
