@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, Users, Search, MoreHorizontal } from 'lucide-react';
+import { Plus, Users, Search, MoreHorizontal, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
 
 const Teams = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   // Mock data for teams
   const teams = [
@@ -106,7 +108,9 @@ const Teams = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem>Edit Team</DropdownMenuItem>
-                      <DropdownMenuItem>Manage Members</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/teams/${team.id}/members`)}>
+                        Manage Members
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600">
                         Delete Team
                       </DropdownMenuItem>
@@ -144,9 +148,14 @@ const Teams = () => {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full">
-                  View Team
-                </Button>
+                <div className="flex space-x-2">
+                  <Button variant="outline" className="flex-1">
+                    View Team
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/teams/${team.id}/members`)}>
+                    <UserPlus className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

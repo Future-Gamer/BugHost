@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Teams from "./pages/Teams";
+import TeamMembers from "./pages/TeamMembers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,11 @@ const App = () => (
             <Route path="/teams" element={
               <ProtectedRoute>
                 <Teams />
+              </ProtectedRoute>
+            } />
+            <Route path="/teams/:teamId/members" element={
+              <ProtectedRoute>
+                <TeamMembers />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
