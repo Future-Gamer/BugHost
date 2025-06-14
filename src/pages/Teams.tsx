@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { CreateTeamModal } from '@/components/teams/CreateTeamModal';
+import { useTeams } from '@/hooks/useTeams';
 import { Plus, Users, Search, MoreHorizontal, UserPlus } from 'lucide-react';
 import {
   DropdownMenu,
@@ -16,50 +18,45 @@ import {
 
 const Teams = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateTeam, setShowCreateTeam] = useState(false);
   const navigate = useNavigate();
-
-  // Mock data for teams
-  const teams = [
-    {
-      id: '1',
-      name: 'Frontend Development',
-      description: 'Responsible for all frontend development tasks',
-      memberCount: 5,
-      role: 'admin',
-      members: [
-        { id: '1', name: 'John Doe', role: 'admin' },
-        { id: '2', name: 'Jane Smith', role: 'developer' },
-        { id: '3', name: 'Mike Johnson', role: 'developer' },
-      ]
-    },
-    {
-      id: '2',
-      name: 'Backend Development',
-      description: 'Backend API and database management',
-      memberCount: 4,
-      role: 'developer',
-      members: [
-        { id: '4', name: 'Sarah Wilson', role: 'manager' },
-        { id: '5', name: 'Tom Brown', role: 'developer' },
-      ]
-    },
-    {
-      id: '3',
-      name: 'QA Team',
-      description: 'Quality assurance and testing',
-      memberCount: 3,
-      role: 'tester',
-      members: [
-        { id: '6', name: 'Lisa Davis', role: 'manager' },
-        { id: '7', name: 'Chris Lee', role: 'tester' },
-      ]
-    }
-  ];
+  const { data: teams = [], isLoading, error } = useTeams();
 
   const filteredTeams = teams.filter(team =>
     team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (team.description && team.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading teams...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center text-red-600">
+                Error loading teams: {error.message}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -69,7 +66,7 @@ const Teams = () => {
             <h1 className="text-3xl font-bold text-gray-900">Teams</h1>
             <p className="text-gray-600 mt-2">Manage your teams and collaborate with team members.</p>
           </div>
-          <Button>
+          <Button onClick={() => setShowCreateTeam(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Team
           </Button>
@@ -98,7 +95,7 @@ const Teams = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <CardTitle className="text-lg">{team.name}</CardTitle>
-                    <CardDescription>{team.description}</CardDescription>
+                    <CardDescription>{team.description || 'No description provided'}</CardDescription>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -122,34 +119,15 @@ const Teams = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">{team.memberCount} members</span>
+                    <span className="text-sm text-gray-600">Team ID: {team.id.substring(0, 8)}...</span>
                   </div>
-                  <Badge variant="secondary" className="capitalize">
-                    {team.role}
+                  <Badge variant="secondary">
+                    Created {new Date(team.created_at).toLocaleDateString()}
                   </Badge>
                 </div>
 
-                {/* Team Members */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700">Members</div>
-                  <div className="flex -space-x-2">
-                    {team.members.slice(0, 4).map((member) => (
-                      <Avatar key={member.id} className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback className="text-xs">
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
-                    {team.memberCount > 4 && (
-                      <div className="h-8 w-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-                        <span className="text-xs text-gray-600">+{team.memberCount - 4}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 <div className="flex space-x-2">
-                  <Button variant="outline" className="flex-1">
+                  <Button variant="outline" className="flex-1" onClick={() => navigate(`/teams/${team.id}/members`)}>
                     View Team
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => navigate(`/teams/${team.id}/members`)}>
@@ -170,10 +148,21 @@ const Teams = () => {
                 <p className="text-gray-500">
                   {searchTerm ? 'Try adjusting your search terms.' : 'Create your first team to get started.'}
                 </p>
+                {!searchTerm && (
+                  <Button onClick={() => setShowCreateTeam(true)} className="mt-4">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Your First Team
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
         )}
+
+        <CreateTeamModal 
+          isOpen={showCreateTeam}
+          onClose={() => setShowCreateTeam(false)}
+        />
       </div>
     </div>
   );
