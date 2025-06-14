@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
-import { ArrowLeft, Users, Calendar, User, Settings, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, User, BarChart3 } from 'lucide-react';
 import { useTeams } from '@/hooks/useTeams';
 
 const TeamMembers = () => {
@@ -49,10 +49,6 @@ const TeamMembers = () => {
             <Button variant="outline" size="sm" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               Analytics
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Team Settings
             </Button>
           </div>
         </div>
