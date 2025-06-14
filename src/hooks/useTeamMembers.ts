@@ -49,8 +49,8 @@ export const useAddTeamMember = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['team-members', variables.team_id] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
       toast({
         title: "Success",
         description: "Team member added successfully",
@@ -83,12 +83,8 @@ export const useUpdateTeamMember = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['team-members', data.team_id] });
-      toast({
-        title: "Success",
-        description: "Team member role updated successfully",
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
     },
     onError: (error) => {
       toast({
@@ -107,25 +103,15 @@ export const useRemoveTeamMember = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data: memberData, error: fetchError } = await supabase
-        .from('team_members')
-        .select('team_id')
-        .eq('id', id)
-        .single();
-      
-      if (fetchError) throw fetchError;
-      
       const { error } = await supabase
         .from('team_members')
         .delete()
         .eq('id', id);
       
       if (error) throw error;
-      
-      return memberData.team_id;
     },
-    onSuccess: (teamId) => {
-      queryClient.invalidateQueries({ queryKey: ['team-members', teamId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
       toast({
         title: "Success",
         description: "Team member removed successfully",
