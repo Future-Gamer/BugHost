@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { useIssues } from '@/hooks/useIssues';
 import { useTeams } from '@/hooks/useTeams';
 import { useProjects } from '@/hooks/useProjects';
-import { AnalyticsOverview } from '@/components/analytics/AnalyticsOverview';
 
 const Index = () => {
   const { data: issues = [] } = useIssues();
@@ -23,7 +22,7 @@ const Index = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">BugHost Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
             <p className="text-muted-foreground mt-1">
               Welcome back! Here's what's happening with your projects.
             </p>
@@ -38,10 +37,43 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Analytics Overview */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
-          <AnalyticsOverview />
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Projects</p>
+                  <p className="text-2xl font-bold">{projects.length}</p>
+                </div>
+                <FolderOpen className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Issues</p>
+                  <p className="text-2xl font-bold">{issues.length}</p>
+                </div>
+                <Bug className="h-8 w-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Teams</p>
+                  <p className="text-2xl font-bold">{teams.length}</p>
+                </div>
+                <Users className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions & Recent Issues */}
@@ -127,9 +159,9 @@ const Index = () => {
                       </div>
                       <Badge variant={
                         issue.status === 'done' ? 'default' :
-                        issue.status === 'in_progress' ? 'secondary' : 'outline'
+                        issue.status === 'inprogress' ? 'secondary' : 'outline'
                       }>
-                        {issue.status.replace('_', ' ')}
+                        {issue.status === 'inprogress' ? 'in progress' : issue.status}
                       </Badge>
                     </div>
                   ))}

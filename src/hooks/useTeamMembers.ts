@@ -50,9 +50,7 @@ export const useAddTeamMember = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      // Invalidate all team-members queries for this team
       queryClient.invalidateQueries({ queryKey: ['team-members', variables.team_id] });
-      queryClient.invalidateQueries({ queryKey: ['team-members'] });
       toast({
         title: "Success",
         description: "Team member added successfully",
@@ -86,9 +84,7 @@ export const useUpdateTeamMember = () => {
       return data;
     },
     onSuccess: (data) => {
-      // Invalidate queries for the specific team and all team-members queries
       queryClient.invalidateQueries({ queryKey: ['team-members', data.team_id] });
-      queryClient.invalidateQueries({ queryKey: ['team-members'] });
       toast({
         title: "Success",
         description: "Team member role updated successfully",
@@ -111,7 +107,6 @@ export const useRemoveTeamMember = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      // First get the team_id before deletion for cache invalidation
       const { data: memberData, error: fetchError } = await supabase
         .from('team_members')
         .select('team_id')
@@ -130,13 +125,7 @@ export const useRemoveTeamMember = () => {
       return memberData.team_id;
     },
     onSuccess: (teamId) => {
-      // Immediately invalidate and refetch the team members data
       queryClient.invalidateQueries({ queryKey: ['team-members', teamId] });
-      queryClient.invalidateQueries({ queryKey: ['team-members'] });
-      
-      // Force refetch to update UI immediately
-      queryClient.refetchQueries({ queryKey: ['team-members', teamId] });
-      
       toast({
         title: "Success",
         description: "Team member removed successfully",

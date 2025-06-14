@@ -53,7 +53,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <Bug className="h-6 w-6 text-destructive" />
-          <h2 className="text-lg font-semibold">BugHost</h2>
+          <h2 className="text-lg font-semibold">Bug Tracker</h2>
         </div>
       </SidebarHeader>
       

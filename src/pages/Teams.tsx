@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Home, Plus } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar } from "lucide-react";
+import { Users, Calendar, Settings } from "lucide-react";
 import { useTeams } from "@/hooks/useTeams";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateTeamModal } from "@/components/teams/CreateTeamModal";
@@ -108,10 +108,18 @@ const Teams = () => {
                 </Button>
               </Link>
             </div>
-            <Button onClick={() => setShowCreateTeam(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Team
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Link to="/settings">
+                <Button variant="outline" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Team Settings
+                </Button>
+              </Link>
+              <Button onClick={() => setShowCreateTeam(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Team
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-6">
