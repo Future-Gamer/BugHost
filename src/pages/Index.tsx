@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { ProjectList } from "@/components/projects/ProjectList";
@@ -19,40 +20,42 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
-      <Sidebar />
+    <SidebarProvider>
+      <div className="min-h-screen bg-gray-50 flex w-full">
+        <Sidebar />
 
-      <div className="flex-1 flex flex-col">
-        <TopNav 
-          selectedProject={selectedProject}
-          onCreateProject={() => setShowCreateProject(true)}
-          onCreateIssue={() => setShowCreateIssue(true)}
+        <div className="flex-1 flex flex-col">
+          <TopNav 
+            selectedProject={selectedProject}
+            onCreateProject={() => setShowCreateProject(true)}
+            onCreateIssue={() => setShowCreateIssue(true)}
+          />
+          
+          <main className="flex-1 p-6">
+            {currentView === 'projects' ? (
+              <ProjectList onSelectProject={handleSelectProject} />
+            ) : (
+              <IssueBoard 
+                projectId={selectedProject?.id || null}
+                projectName={selectedProject?.name}
+                onCreateIssue={() => setShowCreateIssue(true)}
+              />
+            )}
+          </main>
+        </div>
+
+        <CreateProjectModal 
+          isOpen={showCreateProject}
+          onClose={() => setShowCreateProject(false)}
         />
-        
-        <main className="flex-1 p-6">
-          {currentView === 'projects' ? (
-            <ProjectList onSelectProject={handleSelectProject} />
-          ) : (
-            <IssueBoard 
-              projectId={selectedProject?.id || null}
-              projectName={selectedProject?.name}
-              onCreateIssue={() => setShowCreateIssue(true)}
-            />
-          )}
-        </main>
+
+        <CreateIssueModal 
+          isOpen={showCreateIssue}
+          onClose={() => setShowCreateIssue(false)}
+          projectId={selectedProject?.id || null}
+        />
       </div>
-
-      <CreateProjectModal 
-        isOpen={showCreateProject}
-        onClose={() => setShowCreateProject(false)}
-      />
-
-      <CreateIssueModal 
-        isOpen={showCreateIssue}
-        onClose={() => setShowCreateIssue(false)}
-        projectId={selectedProject?.id || null}
-      />
-    </div>
+    </SidebarProvider>
   );
 };
 
