@@ -20,14 +20,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex w-full">
-      <Sidebar 
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        selectedProject={selectedProject?.id || null}
-        onCreateProject={() => setShowCreateProject(true)}
-        onCreateIssue={() => setShowCreateIssue(true)}
-      />
-      
+      {/* Remove props for Sidebar, since Sidebar does not accept any */}
+      <Sidebar />
+
       <div className="flex-1 flex flex-col">
         <TopNav 
           selectedProject={selectedProject}
@@ -63,3 +58,4 @@ const Index = () => {
 };
 
 export default Index;
+
