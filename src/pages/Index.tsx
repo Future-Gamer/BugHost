@@ -1,6 +1,6 @@
+
 import { useState } from "react";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Sidebar, SidebarProvider } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { IssueBoard } from "@/components/issues/IssueBoard";
