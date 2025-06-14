@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   FolderOpen,
+  Bug,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -50,7 +51,10 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold">Project Manager</h2>
+        <div className="flex items-center gap-2">
+          <Bug className="h-6 w-6 text-destructive" />
+          <h2 className="text-lg font-semibold">BugHost</h2>
+        </div>
       </SidebarHeader>
       
       <SidebarContent>

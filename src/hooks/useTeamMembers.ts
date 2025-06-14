@@ -49,7 +49,9 @@ export const useAddTeamMember = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      // Invalidate all team-members queries for this team
+      queryClient.invalidateQueries({ queryKey: ['team-members', variables.team_id] });
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
       toast({
         title: "Success",
@@ -83,8 +85,14 @@ export const useUpdateTeamMember = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Invalidate queries for the specific team and all team-members queries
+      queryClient.invalidateQueries({ queryKey: ['team-members', data.team_id] });
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      toast({
+        title: "Success",
+        description: "Team member role updated successfully",
+      });
     },
     onError: (error) => {
       toast({
@@ -103,15 +111,32 @@ export const useRemoveTeamMember = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // First get the team_id before deletion for cache invalidation
+      const { data: memberData, error: fetchError } = await supabase
+        .from('team_members')
+        .select('team_id')
+        .eq('id', id)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
       const { error } = await supabase
         .from('team_members')
         .delete()
         .eq('id', id);
       
       if (error) throw error;
+      
+      return memberData.team_id;
     },
-    onSuccess: () => {
+    onSuccess: (teamId) => {
+      // Immediately invalidate and refetch the team members data
+      queryClient.invalidateQueries({ queryKey: ['team-members', teamId] });
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      
+      // Force refetch to update UI immediately
+      queryClient.refetchQueries({ queryKey: ['team-members', teamId] });
+      
       toast({
         title: "Success",
         description: "Team member removed successfully",

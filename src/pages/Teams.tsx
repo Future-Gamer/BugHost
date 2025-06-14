@@ -16,7 +16,7 @@ const Teams = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
@@ -37,8 +37,8 @@ const Teams = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Teams</h1>
-                <p className="text-gray-600 mt-1">Manage your teams and collaborate</p>
+                <h1 className="text-2xl font-bold text-foreground">Teams</h1>
+                <p className="text-muted-foreground mt-1">Manage your teams and collaborate</p>
               </div>
               <Skeleton className="h-6 w-20" />
             </div>
@@ -55,7 +55,7 @@ const Teams = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
@@ -76,12 +76,12 @@ const Teams = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Teams</h1>
-                <p className="text-gray-600 mt-1">Manage your teams and collaborate</p>
+                <h1 className="text-2xl font-bold text-foreground">Teams</h1>
+                <p className="text-muted-foreground mt-1">Manage your teams and collaborate</p>
               </div>
             </div>
             <div className="text-center py-8">
-              <p className="text-red-600">Error loading teams. Please try again.</p>
+              <p className="text-destructive">Error loading teams. Please try again.</p>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ const Teams = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
@@ -117,8 +117,8 @@ const Teams = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Teams</h1>
-                <p className="text-gray-600 mt-1">Manage your teams and collaborate</p>
+                <h1 className="text-2xl font-bold text-foreground">Teams</h1>
+                <p className="text-muted-foreground mt-1">Manage your teams and collaborate</p>
               </div>
               <Badge variant="secondary" className="px-3 py-1">
                 {teams?.length || 0} Teams
@@ -147,7 +147,7 @@ const Teams = () => {
                   </CardHeader>
                   
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-1">
                           <Users className="h-4 w-4" />
@@ -165,7 +165,7 @@ const Teams = () => {
 
               {teams?.length === 0 && (
                 <div className="col-span-full text-center py-8">
-                  <p className="text-gray-500">No teams found. Create your first team to get started.</p>
+                  <p className="text-muted-foreground">No teams found. Create your first team to get started.</p>
                 </div>
               )}
             </div>
