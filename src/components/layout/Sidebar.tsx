@@ -79,3 +79,7 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+// Export both named and default for compatibility
+export { AppSidebar as Sidebar };
+export default AppSidebar;

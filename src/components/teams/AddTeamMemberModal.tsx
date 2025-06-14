@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -9,11 +9,12 @@ import { useAddTeamMember } from '@/hooks/useTeamMembers';
 import { UserPlus } from 'lucide-react';
 
 interface AddTeamMemberModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   teamId: string;
 }
 
-export const AddTeamMemberModal = ({ teamId }: AddTeamMemberModalProps) => {
-  const [open, setOpen] = useState(false);
+export const AddTeamMemberModal = ({ isOpen, onClose, teamId }: AddTeamMemberModalProps) => {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<'admin' | 'manager' | 'developer' | 'tester'>('developer');
 
@@ -31,7 +32,7 @@ export const AddTeamMemberModal = ({ teamId }: AddTeamMemberModalProps) => {
       status: 'active',
     }, {
       onSuccess: () => {
-        setOpen(false);
+        onClose();
         setSelectedUserId('');
         setSelectedRole('developer');
       },
@@ -39,13 +40,7 @@ export const AddTeamMemberModal = ({ teamId }: AddTeamMemberModalProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Member
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Team Member</DialogTitle>
@@ -89,7 +84,7 @@ export const AddTeamMemberModal = ({ teamId }: AddTeamMemberModalProps) => {
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit" disabled={!selectedUserId || isPending}>
