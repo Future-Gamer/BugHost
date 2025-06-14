@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,7 +8,7 @@ interface Issue {
   id: string;
   title: string;
   description?: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'todo' | 'inprogress' | 'done';
   assignee?: string;
   assignee_profile?: { first_name: string | null; last_name: string | null } | null;
@@ -32,7 +31,7 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'destructive';
+      case 'urgent': return 'destructive';
       case 'high': return 'destructive';
       case 'medium': return 'default';
       case 'low': return 'secondary';
