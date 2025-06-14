@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
 import { useTeamMembers, useRemoveTeamMember, useUpdateTeamMember } from '@/hooks/useTeamMembers';
+import { useTeamInvitations } from '@/hooks/useInvitations';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AddTeamMemberModal } from './AddTeamMemberModal';
+import { InviteMemberModal } from './InviteMemberModal';
 import {
   Table,
   TableBody,
@@ -32,7 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreHorizontal, Plus, Users, UserMinus, Shield } from 'lucide-react';
+import { MoreHorizontal, Plus, Users, UserMinus, Shield, Mail } from 'lucide-react';
 
 interface TeamMembersListProps {
   teamId: string;
@@ -40,10 +42,12 @@ interface TeamMembersListProps {
 
 export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
   const { data: members = [], isLoading, error } = useTeamMembers(teamId);
+  const { data: invitations = [] } = useTeamInvitations(teamId);
   const removeTeamMember = useRemoveTeamMember();
   const updateTeamMember = useUpdateTeamMember();
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 
   const handleRemoveMember = async () => {
@@ -135,24 +139,61 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
                 Manage team members and their roles
               </CardDescription>
             </div>
-            <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Member
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setIsInviteModalOpen(true)} className="gap-2">
+                <Mail className="h-4 w-4" />
+                Invite Member
+              </Button>
+              <Button onClick={() => setIsAddModalOpen(true)} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Member
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
+          {/* Show pending invitations */}
+          {invitations.filter(inv => !inv.accepted_at && new Date(inv.expires_at) > new Date()).length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-medium mb-3">Pending Invitations</h4>
+              <div className="space-y-2">
+                {invitations
+                  .filter(inv => !inv.accepted_at && new Date(inv.expires_at) > new Date())
+                  .map((invitation) => (
+                    <div key={invitation.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{invitation.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Invited as {invitation.role} • Expires {new Date(invitation.expires_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">Pending</Badge>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
           {members.length === 0 ? (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">No team members yet</h3>
               <p className="text-muted-foreground mb-4">
-                Start building your team by adding members
+                Start building your team by adding or inviting members
               </p>
-              <Button onClick={() => setIsAddModalOpen(true)} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add First Member
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={() => setIsInviteModalOpen(true)} className="gap-2">
+                  <Mail className="h-4 w-4" />
+                  Invite Member
+                </Button>
+                <Button onClick={() => setIsAddModalOpen(true)} variant="outline" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Member
+                </Button>
+              </div>
             </div>
           ) : (
             <Table>
@@ -245,6 +286,12 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
       <AddTeamMemberModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        teamId={teamId}
+      />
+
+      <InviteMemberModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
         teamId={teamId}
       />
 

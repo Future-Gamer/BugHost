@@ -1,8 +1,31 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { StatusDropdown } from "./StatusDropdown";
 import { useUpdateIssue } from "@/hooks/useIssues";
+import { MoreHorizontal, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Issue {
   id: string;
@@ -21,12 +44,47 @@ interface IssueCardProps {
 
 export const IssueCard = ({ issue }: IssueCardProps) => {
   const { mutate: updateIssue } = useUpdateIssue();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleStatusChange = (newStatus: 'todo' | 'inprogress' | 'done') => {
     updateIssue({
       id: issue.id,
       updates: { status: newStatus }
     });
+  };
+
+  const handleDeleteIssue = async () => {
+    try {
+      const { error } = await supabase
+        .from('issues')
+        .delete()
+        .eq('id', issue.id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete issue",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Issue deleted successfully",
+        });
+        // Invalidate and refetch issues
+        queryClient.invalidateQueries({ queryKey: ['issues'] });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -55,37 +113,77 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <h4 className="font-medium text-sm leading-tight">{issue.title}</h4>
-          <Badge variant={getPriorityColor(issue.priority)} className="text-xs">
-            {issue.priority}
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-3">
-        {issue.description && (
-          <p className="text-sm text-gray-600 line-clamp-2">{issue.description}</p>
-        )}
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-xs">
-                {getInitials(getAssigneeName())}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-xs text-gray-600">{getAssigneeName()}</span>
+    <>
+      <Card className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <h4 className="font-medium text-sm leading-tight flex-1">{issue.title}</h4>
+            <div className="flex items-center space-x-2">
+              <Badge variant={getPriorityColor(issue.priority)} className="text-xs">
+                {issue.priority}
+              </Badge>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem 
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Issue
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-3">
+          {issue.description && (
+            <p className="text-sm text-gray-600 line-clamp-2">{issue.description}</p>
+          )}
           
-          <StatusDropdown 
-            status={issue.status}
-            onStatusChange={handleStatusChange}
-          />
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-6 w-6">
+                <AvatarFallback className="text-xs">
+                  {getInitials(getAssigneeName())}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-gray-600">{getAssigneeName()}</span>
+            </div>
+            
+            <StatusDropdown 
+              status={issue.status}
+              onStatusChange={handleStatusChange}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Issue</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{issue.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteIssue}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
