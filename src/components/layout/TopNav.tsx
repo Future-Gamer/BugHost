@@ -1,10 +1,12 @@
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Search, Plus } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { SearchResults } from "@/components/search/SearchResults";
 
 interface TopNavProps {
   selectedProject: {id: string; name: string} | null;
@@ -13,6 +15,88 @@ interface TopNavProps {
 }
 
 export const TopNav = ({ selectedProject, onCreateProject, onCreateIssue }: TopNavProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Mock search function - in real app, this would call your API
+  const performSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Mock search results
+    const mockResults = [
+      {
+        id: '1',
+        title: 'Login page not responsive',
+        description: 'The login page layout breaks on mobile devices',
+        type: 'issue',
+        priority: 'high',
+        status: 'todo',
+        projectName: 'Frontend Project'
+      },
+      {
+        id: '2',
+        title: 'Frontend Project',
+        description: 'Main frontend development project',
+        type: 'project'
+      },
+      {
+        id: '3',
+        title: 'Development Team',
+        description: 'Core development team responsible for feature implementation',
+        type: 'team'
+      },
+      {
+        id: '4',
+        title: 'API integration issue',
+        description: 'Backend API returns incorrect data format',
+        type: 'issue',
+        priority: 'medium',
+        status: 'inprogress',
+        projectName: 'Backend Project'
+      }
+    ].filter(item => 
+      item.title.toLowerCase().includes(query.toLowerCase()) ||
+      item.description.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setSearchResults(mockResults);
+    setIsSearching(false);
+  };
+
+  useEffect(() => {
+    const delayedSearch = setTimeout(() => {
+      if (searchQuery) {
+        performSearch(searchQuery);
+        setShowResults(true);
+      } else {
+        setShowResults(false);
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayedSearch);
+  }, [searchQuery]);
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleCloseSearch = () => {
+    setShowResults(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -22,7 +106,16 @@ export const TopNav = ({ selectedProject, onCreateProject, onCreateIssue }: TopN
             <Input
               placeholder="Search issues, projects..."
               className="pl-10 w-96"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
             />
+            {showResults && (
+              <SearchResults
+                query={searchQuery}
+                results={searchResults}
+                onClose={handleCloseSearch}
+              />
+            )}
           </div>
           
           {selectedProject && (

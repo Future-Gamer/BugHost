@@ -8,6 +8,11 @@ type Issue = Tables<'issues'>;
 type IssueInsert = TablesInsert<'issues'>;
 type IssueUpdate = TablesUpdate<'issues'>;
 
+type IssueWithProfiles = Issue & {
+  assignee_profile?: { first_name: string | null; last_name: string | null } | null;
+  reporter_profile?: { first_name: string | null; last_name: string | null } | null;
+};
+
 export const useIssues = (projectId: string | null) => {
   return useQuery({
     queryKey: ['issues', projectId],
@@ -25,10 +30,7 @@ export const useIssues = (projectId: string | null) => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as (Issue & {
-        assignee_profile?: { first_name: string | null; last_name: string | null };
-        reporter_profile?: { first_name: string | null; last_name: string | null };
-      })[];
+      return data as IssueWithProfiles[];
     },
     enabled: !!projectId,
   });
