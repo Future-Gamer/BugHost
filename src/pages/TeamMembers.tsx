@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
-import { ArrowLeft, Users, Calendar, User } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, User, Settings, BarChart3 } from 'lucide-react';
 import { useTeams } from '@/hooks/useTeams';
 
 const TeamMembers = () => {
@@ -14,12 +14,12 @@ const TeamMembers = () => {
 
   if (!teamId) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="p-6">
               <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Team not found</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Team not found</h1>
                 <Button onClick={() => navigate('/teams')} className="gap-2">
                   <ArrowLeft className="h-4 w-4" />
                   Back to Teams
@@ -35,7 +35,7 @@ const TeamMembers = () => {
   const team = teams.find(t => t.id === teamId);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -43,6 +43,16 @@ const TeamMembers = () => {
             <Button variant="ghost" onClick={() => navigate('/teams')} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Teams
+            </Button>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Settings className="h-4 w-4" />
+              Team Settings
             </Button>
           </div>
         </div>
@@ -64,6 +74,24 @@ const TeamMembers = () => {
               </div>
             </CardHeader>
             <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">8</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Active Members</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">24</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Issues Resolved</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">5</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Active Projects</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">92%</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</div>
+                </div>
+              </div>
               <div className="flex items-center gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />

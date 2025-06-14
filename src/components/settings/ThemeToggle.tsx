@@ -19,8 +19,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, onThemeChange }
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">
-        <Sun className="h-4 w-4" />
-        <Label htmlFor="theme-toggle" className="text-sm font-medium">
+        <Sun className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        <Label htmlFor="theme-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Light
         </Label>
       </div>
@@ -30,8 +30,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, onThemeChange }
         onCheckedChange={handleToggle}
       />
       <div className="flex items-center space-x-2">
-        <Moon className="h-4 w-4" />
-        <Label htmlFor="theme-toggle" className="text-sm font-medium">
+        <Moon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        <Label htmlFor="theme-toggle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Dark
         </Label>
       </div>
