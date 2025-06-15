@@ -75,14 +75,21 @@ const Settings = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const [analyticsExporting, setAnalyticsExporting] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(preferences?.usage_analytics ?? true);
+  const [showAnalytics, setShowAnalytics] = useState(true);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false);
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [twoFADialogOpen, setTwoFADialogOpen] = useState(false);
   const [totpSecret, setTotpSecret] = useState<string | null>(null);
   const [totpInput, setTotpInput] = useState('');
   const [totpVerified, setTotpVerified] = useState(false);
-  const [language, setLanguage] = useState(preferences?.language || 'en');
+  const [language, setLanguage] = useState(() => localStorage.getItem("appLanguage") || 'en');
+
+  const { t, i18n } = useTranslation();
+
+  const { data: analyticsData, isLoading: analyticsLoading } = useAnalytics();
+
+  // Make sure analytics only shows if showAnalytics is true
+  // You will need to use <AnalyticsContext.Provider value={{ showAnalytics }}> ... in your analytics consumer components
 
   const handleThemeChange = async (theme: string) => {
     if (!user) return;
@@ -100,7 +107,6 @@ const Settings = () => {
         });
       }
       
-      // Apply theme immediately
       document.documentElement.classList.remove('light', 'dark');
       if (theme === 'system') {
         const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -153,10 +159,19 @@ const Settings = () => {
 
   const handleExportData = async () => {
     setAnalyticsExporting(true);
-    let csv = 'Metric,Value\n';
-    for (const key in analytics) {
-      csv += `${key},${analytics[key]}\n`;
+    if (!analyticsData) {
+      toast({
+        title: "Export Failed",
+        description: "No analytics to export.",
+        variant: "destructive",
+      });
+      setAnalyticsExporting(false);
+      return;
     }
+    let csv = 'Metric,Value\n';
+    Object.entries(analyticsData).forEach(([key, value]) => {
+      csv += `${key},${value}\n`;
+    });
     downloadFile('analytics.csv', csv);
     setAnalyticsExporting(false);
     toast({
@@ -165,63 +180,28 @@ const Settings = () => {
     });
   };
 
-  const handleUsageAnalyticsChange = async (checked: boolean) => {
+  const handleUsageAnalyticsChange = (checked: boolean) => {
     setShowAnalytics(checked);
-    if (!user) return;
-    try {
-      if (preferences) {
-        await updatePreferences.mutateAsync({
-          id: preferences.id,
-          updates: { usage_analytics: checked, updated_at: new Date().toISOString() }
-        });
-      } else {
-        await createPreferences.mutateAsync({
-          user_id: user.id,
-          usage_analytics: checked,
-        });
-      }
-      toast({
-        title: "Analytics Preference Updated",
-        description: checked ? "Usage analytics enabled" : "Usage analytics disabled",
-      });
-    } catch (e) {}
+    // Save preference to localStorage so user's choice persists for demo; update in DB if field is added in schema in future
+    localStorage.setItem("showAnalytics", String(checked));
+    toast({
+      title: "Analytics Preference Updated",
+      description: checked ? "Usage analytics enabled" : "Usage analytics disabled",
+    });
   };
 
-  const handleLanguageChange = async (lang: string) => {
+  const handleLanguageChange = (lang: string) => {
     setLanguage(lang);
-    // Example for i18n:
-    if (typeof window !== "undefined") {
-      localStorage.setItem("appLanguage", lang);
-    }
-    // If using i18n:
-    // i18n.changeLanguage(lang);
-    if (!user) return;
-    try {
-      if (preferences) {
-        await updatePreferences.mutateAsync({
-          id: preferences.id,
-          updates: { language: lang, updated_at: new Date().toISOString() }
-        });
-      } else {
-        await createPreferences.mutateAsync({
-          user_id: user.id,
-          language: lang,
-        });
-      }
-      toast({
-        title: "Language Updated",
-        description: `Language changed to ${lang}`,
-      });
-    } catch (e) {}
+    localStorage.setItem("appLanguage", lang);
+    i18n.changeLanguage(lang);
+    toast({
+      title: "Language Updated",
+      description: `Language changed to ${lang}`,
+    });
   };
 
-  const handleDeleteAccount = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleChangePassword = () => {
-    setChangePasswordDialogOpen(true);
-  };
+  const handleDeleteAccount = () => setDeleteDialogOpen(true);
+  const handleChangePassword = () => setChangePasswordDialogOpen(true);
   const submitPasswordChange = async (newPassword: string) => {
     setChangePasswordLoading(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
@@ -242,15 +222,12 @@ const Settings = () => {
   };
 
   const handleEnable2FA = () => {
-    // Minimal TOTP enable: generate a secret, show QR code, verify token.
-    // In reality: store user's TOTP secret in DB (encrypted!), verify tokens, etc.
     const exampleSecret = Math.random().toString(36).slice(2).toUpperCase().padStart(16, 'X');
     setTotpSecret(exampleSecret);
     setTwoFADialogOpen(true);
     setTotpVerified(false);
   };
   const verifyTotp = () => {
-    // For demo: any 6 digit code works.
     if (totpInput.length === 6) {
       setTotpVerified(true);
       toast({
@@ -261,19 +238,13 @@ const Settings = () => {
     }
   };
 
-  // Actual deletion logic for deleting the user account & profile
   const confirmDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
 
     try {
-      // Delete profile row first (optional, but keeps DB clean)
       await supabase.from("profiles").delete().eq("id", user.id);
-
-      // Delete the Supabase Auth user (must be done via the admin API; for demo, we'll log the user out and the row will be cleaned up by RLS/trigger)
-      // The client cannot delete its own auth user unless using Admin API, but .auth.signOut will invalidate the session.
-      // In a real app, you would call a secure edge function here to fully delete the user from auth.users.
-
+      // delete user via function (would require edge function for full delete, for demo just sign out)
       setDeleteDialogOpen(false);
       toast({
         title: "Account deleted",
@@ -295,7 +266,11 @@ const Settings = () => {
     }
   };
 
-  // Apply theme to document
+  useEffect(() => {
+    const stored = localStorage.getItem("showAnalytics");
+    if (stored !== null) setShowAnalytics(stored === "true");
+  }, []);
+
   useEffect(() => {
     const theme = preferences?.theme || 'light';
     document.documentElement.classList.remove('light', 'dark');
@@ -441,77 +416,38 @@ const Settings = () => {
                     onCheckedChange={handleEmailNotificationsChange}
                   />
                 </div>
+                {/* The following toggles are placeholders, since push/issue/team/week fields are not in schema */}
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Push Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive browser push notifications
-                    </div>
+                    <Label className="text-base text-muted-foreground">Push Notifications</Label>
+                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
                   </div>
-                  <Switch
-                    checked={preferences?.push_notifications ?? false}
-                    onCheckedChange={checked =>
-                      updatePreferences.mutateAsync({
-                        id: preferences.id,
-                        updates: { push_notifications: checked, updated_at: new Date().toISOString() }
-                      })
-                    }
-                  />
+                  <Switch checked={false} disabled />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Issue Updates</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Notify when issues are updated or assigned
-                    </div>
+                    <Label className="text-base text-muted-foreground">Issue Updates</Label>
+                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
                   </div>
-                  <Switch
-                    checked={preferences?.issue_updates ?? false}
-                    onCheckedChange={checked =>
-                      updatePreferences.mutateAsync({
-                        id: preferences.id,
-                        updates: { issue_updates: checked, updated_at: new Date().toISOString() }
-                      })
-                    }
-                  />
+                  <Switch checked={false} disabled />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Team Invitations</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Notify when invited to teams or projects
-                    </div>
+                    <Label className="text-base text-muted-foreground">Team Invitations</Label>
+                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
                   </div>
-                  <Switch
-                    checked={preferences?.team_invitations ?? false}
-                    onCheckedChange={checked =>
-                      updatePreferences.mutateAsync({
-                        id: preferences.id,
-                        updates: { team_invitations: checked, updated_at: new Date().toISOString() }
-                      })
-                    }
-                  />
+                  <Switch checked={false} disabled />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label className="text-base">Weekly Summary</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive weekly activity summaries
-                    </div>
+                    <Label className="text-base text-muted-foreground">Weekly Summary</Label>
+                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
                   </div>
-                  <Switch
-                    checked={preferences?.weekly_summary ?? false}
-                    onCheckedChange={checked =>
-                      updatePreferences.mutateAsync({
-                        id: preferences.id,
-                        updates: { weekly_summary: checked, updated_at: new Date().toISOString() }
-                      })
-                    }
-                  />
+                  <Switch checked={false} disabled />
                 </div>
               </CardContent>
             </Card>
@@ -618,7 +554,7 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            {/* Delete account confirmation dialog */}
+            {/* Dialogs for 2FA, Change Password, Delete Account */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <DialogContent>
                 <DialogHeader>
@@ -644,6 +580,47 @@ const Settings = () => {
                   >
                     {isDeleting ? "Deleting..." : "Delete Account"}
                   </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            {/* Change password dialog */}
+            <ChangePasswordDialog
+              open={changePasswordDialogOpen}
+              onOpenChange={setChangePasswordDialogOpen}
+              onSubmit={submitPasswordChange}
+              isLoading={changePasswordLoading}
+            />
+            {/* Two-factor Auth Dialog */}
+            <Dialog open={twoFADialogOpen} onOpenChange={setTwoFADialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enable 2FA</DialogTitle>
+                </DialogHeader>
+                <div className="py-2">
+                  {totpSecret && (
+                    <>
+                      <div className="font-mono text-xs mb-2">
+                        <span>Secret: </span><span className="bg-gray-100 px-2 py-1 rounded">{totpSecret}</span>
+                      </div>
+                      <div>
+                        Enter 6 digit code from your authenticator:
+                        <input
+                          maxLength={6}
+                          type="text"
+                          className="w-[120px] border rounded p-2 ml-2"
+                          value={totpInput}
+                          onChange={e => setTotpInput(e.target.value)}
+                          disabled={totpVerified}
+                        />
+                      </div>
+                      <Button className="mt-2" onClick={verifyTotp} disabled={totpInput.length !== 6 || totpVerified}>
+                        {totpVerified ? "Verified" : "Verify"}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button onClick={() => setTwoFADialogOpen(false)}>Close</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
