@@ -204,6 +204,7 @@ export type Database = {
       projects: {
         Row: {
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           name: string
@@ -212,6 +213,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           name: string
@@ -220,13 +222,22 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           name?: string
           status?: Database["public"]["Enums"]["project_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       team_members: {
         Row: {
