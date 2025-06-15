@@ -1,5 +1,5 @@
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopNav } from './TopNav';
 import { useLocation } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { useFilters } from '@/hooks/useFilters';
 import { projectFilterGroups } from '@/components/projects/ProjectList';
 import { issueFilterGroups } from '@/components/issues/IssueBoard';
 import { teamMemberFilterGroups } from '@/components/teams/TeamMembersList';
+import { CreateIssueModal } from '@/components/issues/CreateIssueModal';
 
 interface FilterProps {
   selectedFilters: Record<string, string[]>;
@@ -28,6 +29,7 @@ export const AppLayout = ({
   onCreateIssue = () => {} 
 }: AppLayoutProps) => {
   const location = useLocation();
+  const [isCreateIssueModalOpen, setIsCreateIssueModalOpen] = useState(false);
   
   // Determine which filter groups to use based on current route
   const getFilterGroups = () => {
@@ -44,14 +46,22 @@ export const AppLayout = ({
   const filterGroups = getFilterGroups();
   const { selectedFilters, handleFilterChange, clearFilters } = useFilters(filterGroups);
 
+  const handleCreateIssue = () => {
+    if (selectedProject) {
+      setIsCreateIssueModalOpen(true);
+    } else {
+      onCreateIssue();
+    }
+  };
+
   return (
     <div className="min-h-screen flex w-full">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <TopNav 
           selectedProject={selectedProject || null}
           onCreateProject={onCreateProject}
-          onCreateIssue={onCreateIssue}
+          onCreateIssue={handleCreateIssue}
           filterGroups={filterGroups}
           selectedFilters={selectedFilters}
           onFilterChange={handleFilterChange}
@@ -65,6 +75,15 @@ export const AppLayout = ({
           }
         </main>
       </div>
+
+      {/* Create Issue Modal */}
+      {selectedProject && (
+        <CreateIssueModal
+          isOpen={isCreateIssueModalOpen}
+          onClose={() => setIsCreateIssueModalOpen(false)}
+          projectId={selectedProject.id}
+        />
+      )}
     </div>
   );
 };

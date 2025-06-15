@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { IssueBoard } from "@/components/issues/IssueBoard";
 import { AnalyticsOverview } from "@/components/analytics/AnalyticsOverview";
+import { CreateIssueModal } from "@/components/issues/CreateIssueModal";
 
 interface IndexProps {
   selectedFilters?: Record<string, string[]>;
@@ -15,6 +16,7 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
   const location = useLocation();
   const [selectedProject, setSelectedProject] = useState<{id: string; name: string} | null>(null);
   const [currentView, setCurrentView] = useState<'projects' | 'board'>('projects');
+  const [isCreateIssueModalOpen, setIsCreateIssueModalOpen] = useState(false);
 
   // Check if we have a selected project from navigation state
   useEffect(() => {
@@ -34,6 +36,10 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
     setCurrentView('projects');
   };
 
+  const handleCreateIssue = () => {
+    setIsCreateIssueModalOpen(true);
+  };
+
   return (
     <div className="p-6">
       {currentView === 'projects' && <AnalyticsOverview />}
@@ -49,11 +55,20 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
         <IssueBoard 
           projectId={selectedProject?.id || null}
           projectName={selectedProject?.name}
-          onCreateIssue={() => {}}
+          onCreateIssue={handleCreateIssue}
           onBackToProjects={handleBackToProjects}
           selectedFilters={selectedFilters}
           onFilterChange={onFilterChange}
           onClearFilters={onClearFilters}
+        />
+      )}
+
+      {/* Create Issue Modal */}
+      {selectedProject && (
+        <CreateIssueModal
+          isOpen={isCreateIssueModalOpen}
+          onClose={() => setIsCreateIssueModalOpen(false)}
+          projectId={selectedProject.id}
         />
       )}
     </div>
