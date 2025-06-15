@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -28,32 +29,44 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={
               <ProtectedRoute>
-                <Index />
+                <AppLayout>
+                  <Index />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/projects" element={
               <ProtectedRoute>
-                <Projects />
+                <AppLayout>
+                  <Projects />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/profile" element={
               <ProtectedRoute>
-                <Profile />
+                <AppLayout>
+                  <Profile />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
-                <Settings />
+                <AppLayout>
+                  <Settings />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/teams" element={
               <ProtectedRoute>
-                <Teams />
+                <AppLayout>
+                  <Teams />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/teams/:teamId/members" element={
               <ProtectedRoute>
-                <TeamMembers />
+                <AppLayout>
+                  <TeamMembers />
+                </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

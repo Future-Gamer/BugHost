@@ -1,33 +1,26 @@
 
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
-import { ArrowLeft, Users, Calendar, User, BarChart3 } from 'lucide-react';
+import { Users, Calendar, User, BarChart3 } from 'lucide-react';
 import { useTeams } from '@/hooks/useTeams';
+import { Button } from '@/components/ui/button';
 
 const TeamMembers = () => {
   const { teamId } = useParams<{ teamId: string }>();
-  const navigate = useNavigate();
   const { data: teams = [] } = useTeams();
 
   if (!teamId) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Team not found</h1>
-                <Button onClick={() => navigate('/teams')} className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Teams
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="p-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Team not found</h1>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -35,24 +28,8 @@ const TeamMembers = () => {
   const team = teams.find(t => t.id === teamId);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/teams')} className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Teams
-            </Button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </Button>
-          </div>
-        </div>
-
         {/* Team Info */}
         {team && (
           <Card>
@@ -67,6 +44,10 @@ const TeamMembers = () => {
                     {team.description || 'No description provided'}
                   </CardDescription>
                 </div>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
