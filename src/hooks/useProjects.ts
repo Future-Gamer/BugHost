@@ -17,13 +17,11 @@ export const useProjects = () => {
       if (!profile?.id) return [];
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
-        // .select<Project[]>('*')  // <-- removed this
-        .eq('created_by', profile.id)
+        .select('*') // No filtering, since created_by column doesn't exist
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      // Cast here to avoid type inference issues
+      // Just cast the result as Project[]
       return (data ?? []) as Project[];
     },
     enabled: !!profile?.id,
@@ -39,11 +37,12 @@ export const useCreateProject = () => {
     mutationFn: async (project: any) => {
       if (!profile?.id) throw new Error('User profile not found.');
 
+      // No "created_by" column in the projects table, so just insert the object as is
       const { data, error } = await supabase
         .from('projects')
         .insert({
           ...project,
-          created_by: profile.id,
+          // created_by: profile.id, // REMOVE this field as it doesn't exist in schema
         })
         .select()
         .single();
