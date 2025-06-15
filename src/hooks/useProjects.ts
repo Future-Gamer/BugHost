@@ -17,13 +17,12 @@ export const useProjects = () => {
       if (!profile?.id) return [];
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select<Project[]>('*')
         .eq('created_by', profile.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      // Enforce type, avoid inference issues
-      return (data ?? []) as Project[];
+      return data ?? [];
     },
     enabled: !!profile?.id,
   });
