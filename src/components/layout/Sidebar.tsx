@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -50,7 +49,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold">Project Manager</h2>
+        <h2 className="text-lg font-semibold">BugHost</h2>
       </SidebarHeader>
       
       <SidebarContent>
@@ -83,4 +82,3 @@ export function AppSidebar() {
 // Export both named and default for compatibility
 export { AppSidebar as Sidebar };
 export default AppSidebar;
-
