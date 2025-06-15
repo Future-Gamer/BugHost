@@ -61,7 +61,6 @@ const ChangePasswordDialog = ({ open, onOpenChange, onSubmit, isLoading }: {
 };
 
 // Analytics Context for hiding/showing analytics in app
-import React from 'react';
 export const AnalyticsContext = React.createContext({ showAnalytics: true });
 export const useShowAnalytics = () => React.useContext(AnalyticsContext);
 
