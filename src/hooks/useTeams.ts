@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useProfile } from '@/hooks/useProfiles';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 
 type Team = Tables<'teams'>;
@@ -9,29 +10,40 @@ type TeamInsert = TablesInsert<'teams'>;
 type TeamUpdate = TablesUpdate<'teams'>;
 
 export const useTeams = () => {
+  const { data: profile } = useProfile();
+
   return useQuery({
-    queryKey: ['teams'],
+    queryKey: ['teams', profile?.id],
     queryFn: async () => {
+      if (!profile?.id) return [];
       const { data, error } = await supabase
         .from('teams')
         .select('*')
+        .eq('created_by', profile.id)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
       return (data || []) as Team[];
     },
+    enabled: !!profile?.id,
   });
 };
 
 export const useCreateTeam = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { data: profile } = useProfile();
 
   return useMutation({
-    mutationFn: async (team: Omit<TeamInsert, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (team: Omit<TeamInsert, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
+      if (!profile?.id) throw new Error('User profile not found.');
+      const fullTeam = {
+        ...team,
+        created_by: profile.id,
+      };
       const { data, error } = await supabase
         .from('teams')
-        .insert(team)
+        .insert(fullTeam)
         .select()
         .single();
       

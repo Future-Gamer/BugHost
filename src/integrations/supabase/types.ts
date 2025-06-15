@@ -65,6 +65,7 @@ export type Database = {
           assignee: string | null
           assignee_id: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           priority: Database["public"]["Enums"]["ticket_priority"]
@@ -80,6 +81,7 @@ export type Database = {
           assignee?: string | null
           assignee_id?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
@@ -95,6 +97,7 @@ export type Database = {
           assignee?: string | null
           assignee_id?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
@@ -110,6 +113,13 @@ export type Database = {
           {
             foreignKeyName: "issues_assignee_id_fkey"
             columns: ["assignee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

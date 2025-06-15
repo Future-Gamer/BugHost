@@ -1,6 +1,8 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useProfile } from '@/hooks/useProfiles';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 
 type Issue = Tables<'issues'>;
@@ -13,9 +15,12 @@ type IssueWithProfiles = Issue & {
 };
 
 export const useIssues = (projectId: string | null) => {
+  const { data: profile } = useProfile();
+
   return useQuery({
-    queryKey: ['issues', projectId],
+    queryKey: ['issues', projectId, profile?.id],
     queryFn: async () => {
+      if (!profile?.id) return [];
       let query = supabase
         .from('issues')
         .select(`
@@ -23,8 +28,9 @@ export const useIssues = (projectId: string | null) => {
           assignee_profile:profiles!issues_assignee_id_fkey(first_name, last_name),
           reporter_profile:profiles!issues_reporter_id_fkey(first_name, last_name)
         `)
+        .eq('created_by', profile.id)
         .order('created_at', { ascending: false });
-      
+
       // Only filter by project if projectId is provided
       if (projectId) {
         query = query.eq('project_id', projectId);
@@ -35,18 +41,25 @@ export const useIssues = (projectId: string | null) => {
       if (error) throw error;
       return (data || []) as IssueWithProfiles[];
     },
+    enabled: !!profile?.id,
   });
 };
 
 export const useCreateIssue = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { data: profile } = useProfile();
 
   return useMutation({
     mutationFn: async (issue: Omit<IssueInsert, 'id' | 'created_at' | 'updated_at'>) => {
+      if (!profile?.id) throw new Error('User profile not found.');
+      const fullIssue = {
+        ...issue,
+        created_by: profile.id,
+      };
       const { data, error } = await supabase
         .from('issues')
-        .insert(issue)
+        .insert(fullIssue)
         .select()
         .single();
       
