@@ -8,8 +8,14 @@ import { projectFilterGroups } from '@/components/projects/ProjectList';
 import { issueFilterGroups } from '@/components/issues/IssueBoard';
 import { teamMemberFilterGroups } from '@/components/teams/TeamMembersList';
 
+interface FilterProps {
+  selectedFilters: Record<string, string[]>;
+  onFilterChange: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters: () => void;
+}
+
 interface AppLayoutProps {
-  children: ReactNode;
+  children: ReactNode | ((props: FilterProps) => ReactNode);
   selectedProject?: {id: string; name: string} | null;
   onCreateProject?: () => void;
   onCreateIssue?: () => void;
