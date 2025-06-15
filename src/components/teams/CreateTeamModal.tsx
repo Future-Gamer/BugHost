@@ -23,17 +23,19 @@ export const CreateTeamModal = ({ isOpen, onClose }: CreateTeamModalProps) => {
     e.preventDefault();
     if (!name.trim() || !user) return;
 
-    createTeam({
-      name: name.trim(),
-      description: description.trim() || null,
-      created_by: user.id,
-    }, {
-      onSuccess: () => {
-        onClose();
-        setName('');
-        setDescription('');
+    createTeam(
+      {
+        name: name.trim(),
+        description: description.trim() || null,
       },
-    });
+      {
+        onSuccess: () => {
+          onClose();
+          setName('');
+          setDescription('');
+        },
+      }
+    );
   };
 
   return (
