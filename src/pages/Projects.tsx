@@ -14,7 +14,7 @@ const Projects = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3 md:p-6 h-full">
       <ProjectList 
         onSelectProject={handleSelectProject}
         selectedFilters={selectedFilters}

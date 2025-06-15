@@ -57,7 +57,7 @@ export const AppLayout = ({
   return (
     <div className="min-h-screen flex w-full">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopNav 
           selectedProject={selectedProject || null}
           onCreateProject={onCreateProject}
@@ -67,12 +67,14 @@ export const AppLayout = ({
           onFilterChange={handleFilterChange}
           onClearFilters={clearFilters}
         />
-        <main className="flex-1 overflow-auto">
-          {/* Pass filter props to children if they need them */}
-          {typeof children === 'function' 
-            ? children({ selectedFilters, onFilterChange: handleFilterChange, onClearFilters: clearFilters })
-            : children
-          }
+        <main className="flex-1 overflow-auto bg-gray-50 md:bg-background">
+          <div className="h-full">
+            {/* Pass filter props to children if they need them */}
+            {typeof children === 'function' 
+              ? children({ selectedFilters, onFilterChange: handleFilterChange, onClearFilters: clearFilters })
+              : children
+            }
+          </div>
         </main>
       </div>
 

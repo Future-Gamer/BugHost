@@ -41,8 +41,12 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
   };
 
   return (
-    <div className="p-6">
-      {currentView === 'projects' && <AnalyticsOverview />}
+    <div className="p-3 md:p-6 h-full">
+      {currentView === 'projects' && (
+        <div className="mb-4 md:mb-6">
+          <AnalyticsOverview />
+        </div>
+      )}
       
       {currentView === 'projects' ? (
         <ProjectList 
