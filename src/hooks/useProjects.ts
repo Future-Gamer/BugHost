@@ -1,11 +1,9 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfiles';
 import { useToast } from '@/hooks/use-toast';
 import type { Tables, TablesInsert } from '@/integrations/supabase/types';
 
-type Project = Tables<'projects'>;
 type ProjectInsert = TablesInsert<'projects'>;
 
 export const useProjects = () => {
@@ -15,7 +13,7 @@ export const useProjects = () => {
     queryKey: ['projects', profile?.id],
     queryFn: async () => {
       if (!profile?.id) return [];
-      // Let TypeScript infer the type
+      // Let TypeScript infer the type naturally to avoid deep recursion in types
       const { data, error } = await supabase
         .from('projects')
         .select('*')
@@ -23,7 +21,6 @@ export const useProjects = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      // No explicit type cast to Project[]
       return data || [];
     },
     enabled: !!profile?.id,
@@ -36,7 +33,6 @@ export const useCreateProject = () => {
   const { data: profile } = useProfile();
 
   return useMutation({
-    // Let the parameter be any object, rely on API validation
     mutationFn: async (project: any) => {
       if (!profile?.id) throw new Error('User profile not found.');
 
