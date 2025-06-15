@@ -2,6 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -29,44 +30,56 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <Index />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <Index />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="/projects" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <Projects />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <Projects />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="/profile" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <Profile />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <Profile />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <Settings />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <Settings />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="/teams" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <Teams />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <Teams />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="/teams/:teamId/members" element={
               <ProtectedRoute>
-                <AppLayout>
-                  <TeamMembers />
-                </AppLayout>
+                <SidebarProvider>
+                  <AppLayout>
+                    <TeamMembers />
+                  </AppLayout>
+                </SidebarProvider>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
