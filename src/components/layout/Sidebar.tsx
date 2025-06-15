@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -6,6 +7,7 @@ import {
   Users,
   Settings,
   FolderOpen,
+  Bug,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -23,7 +25,7 @@ import {
 const navigationItems = [
   {
     title: 'Dashboard',
-    url: '/dashboard', // Updated this from '/' to '/dashboard'
+    url: '/dashboard',
     icon: Home,
   },
   {
@@ -48,8 +50,16 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold">BugHost</h2>
+      <SidebarHeader className="p-4 pb-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
+            <Bug className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 leading-tight">BugHost</h2>
+            <p className="text-xs text-gray-500 -mt-0.5">Project Management Platform</p>
+          </div>
+        </div>
       </SidebarHeader>
       
       <SidebarContent>
@@ -82,3 +92,4 @@ export function AppSidebar() {
 // Export both named and default for compatibility
 export { AppSidebar as Sidebar };
 export default AppSidebar;
+
