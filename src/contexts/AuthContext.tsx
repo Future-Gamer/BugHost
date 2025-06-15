@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
@@ -98,16 +98,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
+    let isMounted = true;
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
+        
+        if (!isMounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Use setTimeout to avoid potential deadlocks
+          // Use a small delay to avoid potential deadlocks
           setTimeout(async () => {
+            if (!isMounted) return;
+            
             let profileData = await fetchUserProfile(session.user.id);
             
             // If no profile found, try to create one
@@ -120,11 +127,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               );
             }
             
-            setProfile(profileData);
-          }, 0);
+            if (isMounted) {
+              setProfile(profileData);
+            }
+          }, 100);
         } else {
           setProfile(null);
         }
+        
         setLoading(false);
       }
     );
@@ -136,11 +146,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Error getting session:', error);
-          setLoading(false);
+          if (isMounted) setLoading(false);
           return;
         }
 
         console.log('Initial session check:', session?.user?.email);
+        
+        if (!isMounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -157,19 +170,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             );
           }
           
-          setProfile(profileData);
+          if (isMounted) {
+            setProfile(profileData);
+          }
         }
         
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error in initializeAuth:', error);
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     initializeAuth();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
@@ -192,10 +212,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Sign up successful:', data);
       
       // If user is immediately confirmed, ensure profile exists
-      if (data.user && !data.user.email_confirmed_at) {
-        console.log('User created but not confirmed yet');
-      } else if (data.user) {
-        // Create profile immediately if user is confirmed
+      if (data.user && data.user.email_confirmed_at) {
         setTimeout(async () => {
           await createProfileIfMissing(
             data.user.id,

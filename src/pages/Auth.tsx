@@ -99,8 +99,10 @@ const Auth = () => {
         
         // Provide more helpful error messages
         let errorMessage = error.message;
-        if (error.message.includes('Invalid login credentials')) {
+        if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
           errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the confirmation link before signing in.';
         }
         
         toast({
@@ -114,6 +116,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "Successfully signed in.",
         });
+        // Don't manually navigate - let the auth state change handle it
       }
     } catch (error) {
       console.error('Unexpected sign in error:', error);
@@ -141,6 +144,8 @@ const Auth = () => {
         let errorMessage = error.message;
         if (error.message.includes('User already registered')) {
           errorMessage = 'An account with this email already exists. Please try signing in instead.';
+        } else if (error.message.includes('Password should be at least')) {
+          errorMessage = 'Password must be at least 6 characters long.';
         }
         
         toast({
