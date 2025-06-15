@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfiles';
@@ -21,6 +22,7 @@ export const useProjects = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      // Enforce type, avoid inference issues
       return (data ?? []) as Project[];
     },
     enabled: !!profile?.id,
