@@ -22,16 +22,86 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useFilters } from "@/hooks/useFilters";
+import type { FilterGroup } from "@/components/ui/filter";
 
 interface ProjectListProps {
   onSelectProject: (projectId: string, projectName: string) => void;
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters?: () => void;
 }
 
-export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
-  const { data: projects, isLoading, error } = useProjects();
+const projectFilterGroups: FilterGroup[] = [
+  {
+    id: 'status',
+    label: 'Status',
+    options: [
+      { id: 'active', label: 'Active', value: 'active' },
+      { id: 'inactive', label: 'Inactive', value: 'inactive' },
+      { id: 'completed', label: 'Completed', value: 'completed' },
+    ]
+  },
+  {
+    id: 'date',
+    label: 'Created',
+    options: [
+      { id: 'today', label: 'Today', value: 'today' },
+      { id: 'week', label: 'This Week', value: 'week' },
+      { id: 'month', label: 'This Month', value: 'month' },
+    ]
+  }
+];
+
+export const ProjectList = ({ 
+  onSelectProject, 
+  selectedFilters = {},
+  onFilterChange,
+  onClearFilters 
+}: ProjectListProps) => {
+  const { data: allProjects, isLoading, error } = useProjects();
   const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject();
   const [projectToDelete, setProjectToDelete] = useState<{id: string; name: string} | null>(null);
+
+  const filteredProjects = useMemo(() => {
+    if (!allProjects) return [];
+    
+    return allProjects.filter(project => {
+      // Status filter
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0 && !statusFilters.includes(project.status)) {
+        return false;
+      }
+
+      // Date filter
+      const dateFilters = selectedFilters.date || [];
+      if (dateFilters.length > 0) {
+        const createdAt = new Date(project.created_at);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const matchesDate = dateFilters.some(filter => {
+          switch (filter) {
+            case 'today':
+              return createdAt >= today;
+            case 'week':
+              return createdAt >= weekAgo;
+            case 'month':
+              return createdAt >= monthAgo;
+            default:
+              return true;
+          }
+        });
+
+        if (!matchesDate) return false;
+      }
+
+      return true;
+    });
+  }, [allProjects, selectedFilters]);
 
   const handleDeleteProject = () => {
     if (projectToDelete) {
@@ -84,12 +154,12 @@ export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
             <p className="text-gray-600 mt-1">Manage your projects and track issues</p>
           </div>
           <Badge variant="secondary" className="px-3 py-1">
-            {projects?.length || 0} Projects
+            {filteredProjects?.length || 0} Projects
           </Badge>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects?.map((project) => (
+          {filteredProjects?.map((project) => (
             <Card 
               key={project.id} 
               className="hover:shadow-lg transition-shadow cursor-pointer group"
@@ -185,3 +255,5 @@ export const ProjectList = ({ onSelectProject }: ProjectListProps) => {
     </>
   );
 };
+
+export { projectFilterGroups };

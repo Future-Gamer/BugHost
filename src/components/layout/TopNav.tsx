@@ -7,14 +7,27 @@ import { Search, Plus } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { SearchResults } from "@/components/search/SearchResults";
+import { FilterComponent, FilterGroup } from "@/components/ui/filter";
 
 interface TopNavProps {
   selectedProject: {id: string; name: string} | null;
   onCreateProject: () => void;
   onCreateIssue: () => void;
+  filterGroups?: FilterGroup[];
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters?: () => void;
 }
 
-export const TopNav = ({ selectedProject, onCreateProject, onCreateIssue }: TopNavProps) => {
+export const TopNav = ({ 
+  selectedProject, 
+  onCreateProject, 
+  onCreateIssue,
+  filterGroups = [],
+  selectedFilters = {},
+  onFilterChange,
+  onClearFilters
+}: TopNavProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -117,6 +130,15 @@ export const TopNav = ({ selectedProject, onCreateProject, onCreateIssue }: TopN
               />
             )}
           </div>
+
+          {filterGroups.length > 0 && onFilterChange && onClearFilters && (
+            <FilterComponent
+              filterGroups={filterGroups}
+              selectedFilters={selectedFilters}
+              onFilterChange={onFilterChange}
+              onClearFilters={onClearFilters}
+            />
+          )}
           
           {selectedProject && (
             <Badge variant="secondary" className="px-3 py-1">

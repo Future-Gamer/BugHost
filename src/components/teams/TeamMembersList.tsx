@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTeamMembers, useRemoveTeamMember, useUpdateTeamMember } from '@/hooks/useTeamMembers';
 import { useTeamInvitations } from '@/hooks/useInvitations';
 import { Button } from '@/components/ui/button';
@@ -35,13 +34,44 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { MoreHorizontal, Plus, Users, UserMinus, Shield, Mail } from 'lucide-react';
+import type { FilterGroup } from '@/components/ui/filter';
 
 interface TeamMembersListProps {
   teamId: string;
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters?: () => void;
 }
 
-export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
-  const { data: members = [], isLoading, error } = useTeamMembers(teamId);
+const teamMemberFilterGroups: FilterGroup[] = [
+  {
+    id: 'role',
+    label: 'Role',
+    options: [
+      { id: 'admin', label: 'Admin', value: 'admin' },
+      { id: 'manager', label: 'Manager', value: 'manager' },
+      { id: 'developer', label: 'Developer', value: 'developer' },
+      { id: 'tester', label: 'Tester', value: 'tester' },
+    ]
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    options: [
+      { id: 'active', label: 'Active', value: 'active' },
+      { id: 'inactive', label: 'Inactive', value: 'inactive' },
+      { id: 'pending', label: 'Pending', value: 'pending' },
+    ]
+  }
+];
+
+export const TeamMembersList: React.FC<TeamMembersListProps> = ({ 
+  teamId, 
+  selectedFilters = {},
+  onFilterChange,
+  onClearFilters 
+}) => {
+  const { data: allMembers = [], isLoading, error } = useTeamMembers(teamId);
   const { data: invitations = [] } = useTeamInvitations(teamId);
   const removeTeamMember = useRemoveTeamMember();
   const updateTeamMember = useUpdateTeamMember();
@@ -49,6 +79,24 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+
+  const filteredMembers = useMemo(() => {
+    return allMembers.filter(member => {
+      // Role filter
+      const roleFilters = selectedFilters.role || [];
+      if (roleFilters.length > 0 && !roleFilters.includes(member.role)) {
+        return false;
+      }
+
+      // Status filter
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0 && !statusFilters.includes(member.status)) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [allMembers, selectedFilters]);
 
   const handleRemoveMember = async () => {
     if (memberToRemove) {
@@ -133,7 +181,7 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Team Members
-                <Badge variant="secondary">{members.length}</Badge>
+                <Badge variant="secondary">{filteredMembers.length}</Badge>
               </CardTitle>
               <CardDescription>
                 Manage team members and their roles
@@ -177,12 +225,14 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
             </div>
           )}
 
-          {members.length === 0 ? (
+          {filteredMembers.length === 0 ? (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No team members yet</h3>
+              <h3 className="text-lg font-medium mb-2">No team members found</h3>
               <p className="text-muted-foreground mb-4">
-                Start building your team by adding or inviting members
+                {allMembers.length === 0 
+                  ? "Start building your team by adding or inviting members"
+                  : "No members match the current filters"}
               </p>
               <div className="flex gap-2 justify-center">
                 <Button onClick={() => setIsInviteModalOpen(true)} className="gap-2">
@@ -207,7 +257,7 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.map((member) => (
+                {filteredMembers.map((member) => (
                   <TableRow key={member.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -314,3 +364,5 @@ export const TeamMembersList: React.FC<TeamMembersListProps> = ({ teamId }) => {
     </div>
   );
 };
+
+export { teamMemberFilterGroups };

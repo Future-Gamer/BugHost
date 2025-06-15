@@ -6,16 +6,85 @@ import { Plus, AlertCircle, ArrowLeft } from "lucide-react";
 import { IssueCard } from "./IssueCard";
 import { useIssues } from "@/hooks/useIssues";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from "react";
+import type { FilterGroup } from "@/components/ui/filter";
 
 interface IssueBoardProps {
   projectId: string | null;
   projectName?: string;
   onCreateIssue: () => void;
   onBackToProjects?: () => void;
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters?: () => void;
 }
 
-export const IssueBoard = ({ projectId, projectName, onCreateIssue, onBackToProjects }: IssueBoardProps) => {
-  const { data: issues, isLoading, error } = useIssues(projectId);
+const issueFilterGroups: FilterGroup[] = [
+  {
+    id: 'status',
+    label: 'Status',
+    options: [
+      { id: 'todo', label: 'To Do', value: 'todo' },
+      { id: 'inprogress', label: 'In Progress', value: 'inprogress' },
+      { id: 'done', label: 'Done', value: 'done' },
+    ]
+  },
+  {
+    id: 'priority',
+    label: 'Priority',
+    options: [
+      { id: 'low', label: 'Low', value: 'low' },
+      { id: 'medium', label: 'Medium', value: 'medium' },
+      { id: 'high', label: 'High', value: 'high' },
+    ]
+  },
+  {
+    id: 'type',
+    label: 'Type',
+    options: [
+      { id: 'bug', label: 'Bug', value: 'bug' },
+      { id: 'feature', label: 'Feature', value: 'feature' },
+      { id: 'task', label: 'Task', value: 'task' },
+    ]
+  }
+];
+
+export const IssueBoard = ({ 
+  projectId, 
+  projectName, 
+  onCreateIssue, 
+  onBackToProjects,
+  selectedFilters = {},
+  onFilterChange,
+  onClearFilters 
+}: IssueBoardProps) => {
+  const { data: allIssues, isLoading, error } = useIssues(projectId);
+
+  const filteredIssues = useMemo(() => {
+    if (!allIssues) return [];
+    
+    return allIssues.filter(issue => {
+      // Status filter
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0 && !statusFilters.includes(issue.status)) {
+        return false;
+      }
+
+      // Priority filter
+      const priorityFilters = selectedFilters.priority || [];
+      if (priorityFilters.length > 0 && !priorityFilters.includes(issue.priority)) {
+        return false;
+      }
+
+      // Type filter
+      const typeFilters = selectedFilters.type || [];
+      if (typeFilters.length > 0 && !typeFilters.includes(issue.type)) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [allIssues, selectedFilters]);
 
   const columns = [
     { id: 'todo', title: 'To Do', status: 'todo' as const },
@@ -24,7 +93,7 @@ export const IssueBoard = ({ projectId, projectName, onCreateIssue, onBackToProj
   ];
 
   const getIssuesByStatus = (status: string) => {
-    return issues?.filter(issue => issue.status === status) || [];
+    return filteredIssues?.filter(issue => issue.status === status) || [];
   };
 
   if (!projectId) {
@@ -132,3 +201,5 @@ export const IssueBoard = ({ projectId, projectName, onCreateIssue, onBackToProj
     </div>
   );
 };
+
+export { issueFilterGroups };

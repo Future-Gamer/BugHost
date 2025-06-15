@@ -5,7 +5,13 @@ import { ProjectList } from "@/components/projects/ProjectList";
 import { IssueBoard } from "@/components/issues/IssueBoard";
 import { AnalyticsOverview } from "@/components/analytics/AnalyticsOverview";
 
-const Index = () => {
+interface IndexProps {
+  selectedFilters?: Record<string, string[]>;
+  onFilterChange?: (groupId: string, optionId: string, checked: boolean) => void;
+  onClearFilters?: () => void;
+}
+
+const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexProps) => {
   const location = useLocation();
   const [selectedProject, setSelectedProject] = useState<{id: string; name: string} | null>(null);
   const [currentView, setCurrentView] = useState<'projects' | 'board'>('projects');
@@ -33,13 +39,21 @@ const Index = () => {
       {currentView === 'projects' && <AnalyticsOverview />}
       
       {currentView === 'projects' ? (
-        <ProjectList onSelectProject={handleSelectProject} />
+        <ProjectList 
+          onSelectProject={handleSelectProject}
+          selectedFilters={selectedFilters}
+          onFilterChange={onFilterChange}
+          onClearFilters={onClearFilters}
+        />
       ) : (
         <IssueBoard 
           projectId={selectedProject?.id || null}
           projectName={selectedProject?.name}
           onCreateIssue={() => {}}
           onBackToProjects={handleBackToProjects}
+          selectedFilters={selectedFilters}
+          onFilterChange={onFilterChange}
+          onClearFilters={onClearFilters}
         />
       )}
     </div>
