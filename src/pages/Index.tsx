@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { IssueBoard } from "@/components/issues/IssueBoard";
@@ -45,48 +45,6 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
     setIsCreateIssueModalOpen(true);
   };
 
-  // Filter projects based on selected filters
-  const filteredProjects = React.useMemo(() => {
-    if (!projects) return [];
-    
-    return projects.filter(project => {
-      if (selectedFilters.status?.length > 0) {
-        if (!selectedFilters.status.includes(project.status || 'active')) {
-          return false;
-        }
-      }
-      
-      if (selectedFilters.priority?.length > 0) {
-        if (!selectedFilters.priority.includes(project.priority || 'medium')) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [projects, selectedFilters]);
-
-  // Filter issues based on selected filters
-  const filteredIssues = React.useMemo(() => {
-    if (!issues) return [];
-    
-    return issues.filter(issue => {
-      if (selectedFilters.status?.length > 0) {
-        if (!selectedFilters.status.includes(issue.status)) {
-          return false;
-        }
-      }
-      
-      if (selectedFilters.priority?.length > 0) {
-        if (!selectedFilters.priority.includes(issue.priority)) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [issues, selectedFilters]);
-
   return (
     <div className="p-3 md:p-6 h-full">
       {currentView === 'projects' && (
@@ -101,7 +59,6 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
           selectedFilters={selectedFilters}
           onFilterChange={onFilterChange}
           onClearFilters={onClearFilters}
-          projects={filteredProjects}
         />
       ) : (
         <IssueBoard 
@@ -112,7 +69,6 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
           selectedFilters={selectedFilters}
           onFilterChange={onFilterChange}
           onClearFilters={onClearFilters}
-          issues={filteredIssues}
         />
       )}
 

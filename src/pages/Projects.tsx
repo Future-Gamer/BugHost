@@ -15,29 +15,6 @@ const Projects = () => {
     navigate('/', { state: { selectedProject: { id: projectId, name: projectName } } });
   };
 
-  // Filter projects based on selected filters
-  const filteredProjects = React.useMemo(() => {
-    if (!projects) return [];
-    
-    return projects.filter(project => {
-      // Check status filter
-      if (selectedFilters.status?.length > 0) {
-        if (!selectedFilters.status.includes(project.status || 'active')) {
-          return false;
-        }
-      }
-      
-      // Check priority filter (if exists in project data)
-      if (selectedFilters.priority?.length > 0) {
-        if (!selectedFilters.priority.includes(project.priority || 'medium')) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [projects, selectedFilters]);
-
   if (isLoading) {
     return (
       <div className="p-3 md:p-6 h-full">
@@ -55,7 +32,6 @@ const Projects = () => {
         selectedFilters={selectedFilters}
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
-        projects={filteredProjects}
       />
     </div>
   );
