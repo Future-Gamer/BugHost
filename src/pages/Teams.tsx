@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -46,13 +45,13 @@ const Teams = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
             </Link>
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="ghost" size="sm">
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
@@ -83,13 +82,13 @@ const Teams = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
             </Link>
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="ghost" size="sm">
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
@@ -117,13 +116,13 @@ const Teams = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
             </Link>
-            <Link to="/">
+            <Link to="/dashboard">
               <Button variant="ghost" size="sm">
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
