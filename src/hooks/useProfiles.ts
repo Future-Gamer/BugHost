@@ -1,21 +1,27 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
 
-export const useProfiles = () => {
+// New: Fetch only the current user's profile
+export const useProfile = () => {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['profiles'],
+    queryKey: ['profile', user?.id],
     queryFn: async () => {
+      if (!user?.id) return null;
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .order('first_name', { ascending: true });
-      
+        .eq('id', user.id)
+        .maybeSingle();
+
       if (error) throw error;
-      return (data || []) as Profile[];
+      return data as Profile | null;
     },
+    enabled: !!user?.id,
   });
 };
