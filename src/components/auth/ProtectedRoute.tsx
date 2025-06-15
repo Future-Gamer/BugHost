@@ -25,8 +25,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
-    console.log('No user found, redirecting to auth');
-    return <Navigate to="/auth" replace />;
+    console.log('No user found, redirecting to introduction');
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

@@ -33,7 +33,7 @@ const Auth = () => {
     // Only redirect authenticated users if they're not resetting passwords
     if (user && type !== 'recovery') {
       console.log('Redirecting authenticated user to dashboard');
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, navigate, type]);
 
@@ -116,7 +116,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "Successfully signed in.",
         });
-        // Don't manually navigate - let the auth state change handle it
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Unexpected sign in error:', error);
