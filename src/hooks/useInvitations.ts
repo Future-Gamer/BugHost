@@ -54,6 +54,39 @@ export const useCreateInvitation = () => {
         .single();
       
       if (error) throw error;
+
+      // Get team and inviter details for email
+      const [teamResult, inviterResult] = await Promise.all([
+        supabase.from('teams').select('name').eq('id', invitation.teamId).single(),
+        supabase.from('profiles').select('first_name, last_name').eq('id', invitation.invitedBy).single()
+      ]);
+
+      const teamName = teamResult.data?.name || 'Unknown Team';
+      const inviterName = inviterResult.data 
+        ? `${inviterResult.data.first_name || ''} ${inviterResult.data.last_name || ''}`.trim() || 'Someone'
+        : 'Someone';
+
+      // Send invitation email
+      const emailResponse = await supabase.functions.invoke('send-invitation', {
+        body: {
+          invitationId: data.id,
+          email: invitation.email,
+          teamName,
+          role: invitation.role,
+          inviterName,
+        },
+      });
+
+      if (emailResponse.error) {
+        console.error('Email sending failed:', emailResponse.error);
+        // Don't throw error - invitation is created, just email failed
+        toast({
+          title: "Invitation created",
+          description: "Invitation was created but email sending failed. Please share the invitation link manually.",
+          variant: "default",
+        });
+      }
+
       return data;
     },
     onSuccess: () => {

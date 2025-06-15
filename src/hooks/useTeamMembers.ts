@@ -103,15 +103,24 @@ export const useRemoveTeamMember = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      console.log('Removing team member with ID:', id);
+      
       const { error } = await supabase
         .from('team_members')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Database error removing team member:', error);
+        throw error;
+      }
+      
+      console.log('Team member removed successfully from database');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
       toast({
         title: "Success",
         description: "Team member removed successfully",

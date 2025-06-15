@@ -92,15 +92,48 @@ export const useDeleteTeam = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      console.log('Deleting team with ID:', id);
+      
+      // First delete all team members
+      const { error: membersError } = await supabase
+        .from('team_members')
+        .delete()
+        .eq('team_id', id);
+      
+      if (membersError) {
+        console.error('Error deleting team members:', membersError);
+        throw membersError;
+      }
+      
+      // Then delete all invitations
+      const { error: invitationsError } = await supabase
+        .from('invitations')
+        .delete()
+        .eq('team_id', id);
+      
+      if (invitationsError) {
+        console.error('Error deleting invitations:', invitationsError);
+        throw invitationsError;
+      }
+      
+      // Finally delete the team
+      const { error: teamError } = await supabase
         .from('teams')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (teamError) {
+        console.error('Error deleting team:', teamError);
+        throw teamError;
+      }
+      
+      console.log('Team and related data deleted successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      queryClient.invalidateQueries({ queryKey: ['team-invitations'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
       toast({
         title: "Success",
         description: "Team deleted successfully",
