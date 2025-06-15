@@ -29,7 +29,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={
+            <Route path="/" element={<Introduction />} />
+            <Route path="/dashboard" element={
               <ProtectedRoute>
                 <SidebarProvider>
                   <AppLayout>
