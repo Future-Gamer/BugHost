@@ -35,39 +35,6 @@ function downloadFile(filename: string, content: string, mime = "text/csv") {
   link.parentNode?.removeChild(link);
 }
 
-// Password change dialog component
-const ChangePasswordDialog = ({ open, onOpenChange, onSubmit, isLoading }: {
-  open: boolean, onOpenChange: (v: boolean) => void, onSubmit: (pw: string) => void, isLoading: boolean
-}) => {
-  const [pw, setPw] = useState('');
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
-        </DialogHeader>
-        <div className="py-4">
-          <input
-            type="password"
-            className="w-full border rounded p-2"
-            placeholder="New Password"
-            value={pw}
-            onChange={e => setPw(e.target.value)}
-            disabled={isLoading}
-            autoFocus
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>Cancel</Button>
-          <Button onClick={() => onSubmit(pw)} disabled={isLoading || !pw}>
-            {isLoading ? 'Changing...' : 'Change Password'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 // Analytics Context for hiding/showing analytics in app
 export const AnalyticsContext = React.createContext({ showAnalytics: true });
 export const useShowAnalytics = () => React.useContext(AnalyticsContext);
