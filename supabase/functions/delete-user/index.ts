@@ -1,5 +1,5 @@
 
-import { createClient } from 'supabase-js';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 // Get environment variables from Supabase secrets
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -29,4 +29,3 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 });
-
