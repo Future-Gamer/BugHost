@@ -240,26 +240,31 @@ const Settings = () => {
   const confirmDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
-
     try {
       // Delete profile row from DB
       await supabase.from("profiles").delete().eq("id", user.id);
 
-      // Call edge function to delete auth user
-      const res = await fetch("/functions/v1/delete-user", {
+      // Use the FULL edge function URL to call the function
+      const functionUrl = `https://fvvzgeqzutmdcfinesxt.functions.supabase.co/delete-user`;
+
+      console.log("Calling edge function to delete auth user:", functionUrl);
+      const res = await fetch(functionUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id }),
       });
 
       const data = await res.json();
+      console.log("Edge function response:", data);
 
       setDeleteDialogOpen(false);
 
       if (!res.ok || data.error) {
         toast({
           title: "Error",
-          description: "Failed to fully delete account. Profile removed, but auth account may remain.",
+          description: data.error
+            ? `Failed to delete Auth account: ${data.error}`
+            : "Failed to fully delete account. Profile removed, but auth account may remain.",
           variant: "destructive",
         });
       } else {
@@ -273,12 +278,13 @@ const Settings = () => {
         await signOut();
         navigate("/auth");
       }, 900);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "Failed to delete account.",
         variant: "destructive",
       });
+      console.error("Delete account error:", error);
     } finally {
       setIsDeleting(false);
     }
