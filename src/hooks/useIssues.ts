@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,22 +16,25 @@ export const useIssues = (projectId: string | null) => {
   return useQuery({
     queryKey: ['issues', projectId],
     queryFn: async () => {
-      if (!projectId) return [];
-      
-      const { data, error } = await supabase
+      let query = supabase
         .from('issues')
         .select(`
           *,
           assignee_profile:profiles!issues_assignee_id_fkey(first_name, last_name),
           reporter_profile:profiles!issues_reporter_id_fkey(first_name, last_name)
         `)
-        .eq('project_id', projectId)
         .order('created_at', { ascending: false });
+      
+      // Only filter by project if projectId is provided
+      if (projectId) {
+        query = query.eq('project_id', projectId);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return (data || []) as IssueWithProfiles[];
     },
-    enabled: !!projectId,
   });
 };
 

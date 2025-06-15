@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, AlertCircle } from "lucide-react";
+import { Plus, AlertCircle, ArrowLeft } from "lucide-react";
 import { IssueCard } from "./IssueCard";
 import { useIssues } from "@/hooks/useIssues";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,9 +11,10 @@ interface IssueBoardProps {
   projectId: string | null;
   projectName?: string;
   onCreateIssue: () => void;
+  onBackToProjects?: () => void;
 }
 
-export const IssueBoard = ({ projectId, projectName, onCreateIssue }: IssueBoardProps) => {
+export const IssueBoard = ({ projectId, projectName, onCreateIssue, onBackToProjects }: IssueBoardProps) => {
   const { data: issues, isLoading, error } = useIssues(projectId);
 
   const columns = [
@@ -42,9 +43,17 @@ export const IssueBoard = ({ projectId, projectName, onCreateIssue }: IssueBoard
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
-            <p className="text-gray-600 mt-1">{projectName && `Project: ${projectName}`}</p>
+          <div className="flex items-center gap-4">
+            {onBackToProjects && (
+              <Button variant="outline" size="sm" onClick={onBackToProjects}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Projects
+              </Button>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
+              <p className="text-gray-600 mt-1">{projectName && `Project: ${projectName}`}</p>
+            </div>
           </div>
           <Button onClick={onCreateIssue}>
             <Plus className="h-4 w-4 mr-2" />
@@ -61,11 +70,19 @@ export const IssueBoard = ({ projectId, projectName, onCreateIssue }: IssueBoard
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
-          <p className="text-gray-600 mt-1">
-            {projectName ? `Project: ${projectName}` : 'Track and manage your issues'}
-          </p>
+        <div className="flex items-center gap-4">
+          {onBackToProjects && (
+            <Button variant="outline" size="sm" onClick={onBackToProjects}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Projects
+            </Button>
+          )}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
+            <p className="text-gray-600 mt-1">
+              {projectName ? `Project: ${projectName}` : 'Track and manage your issues'}
+            </p>
+          </div>
         </div>
         <Button onClick={onCreateIssue}>
           <Plus className="h-4 w-4 mr-2" />

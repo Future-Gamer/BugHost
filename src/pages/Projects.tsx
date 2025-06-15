@@ -1,11 +1,14 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ProjectList } from '@/components/projects/ProjectList';
 
 const Projects = () => {
+  const navigate = useNavigate();
+
   const handleSelectProject = (projectId: string, projectName: string) => {
-    // For now, just log the selection. This could navigate to a project detail page
-    console.log('Selected project:', { projectId, projectName });
+    // Navigate to the dashboard with project selected
+    navigate('/', { state: { selectedProject: { id: projectId, name: projectName } } });
   };
 
   return (
