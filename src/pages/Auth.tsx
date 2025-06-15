@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -25,10 +26,24 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
+    // Only redirect authenticated users, not those resetting passwords
+    if (user && type !== 'recovery') {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, navigate, type]);
+
+  // Handle password recovery - check auth state for recovery session
+  useEffect(() => {
+    if (type === 'recovery') {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY' && session) {
+          // User has a valid recovery session, they can reset password
+          console.log('Password recovery session detected');
+        }
+      });
+      return () => subscription.unsubscribe();
+    }
+  }, [type]);
 
   // Handle password recovery
   if (type === 'recovery') {
@@ -86,7 +101,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Success",
-          description: "Please check your email to confirm your account",
+          description: "Account created successfully! You can now sign in.",
         });
       }
     } catch (error) {
@@ -104,7 +119,7 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome</CardTitle>
+          <CardTitle>Welcome to BugHost</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
