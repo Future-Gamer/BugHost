@@ -242,14 +242,33 @@ const Settings = () => {
     setIsDeleting(true);
 
     try {
+      // Delete profile row from DB
       await supabase.from("profiles").delete().eq("id", user.id);
-      // delete user via function (would require edge function for full delete, for demo just sign out)
-      setDeleteDialogOpen(false);
-      toast({
-        title: "Account deleted",
-        description: "Your account and profile data has been deleted.",
-        variant: "destructive",
+
+      // Call edge function to delete auth user
+      const res = await fetch("/functions/v1/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id }),
       });
+
+      const data = await res.json();
+
+      setDeleteDialogOpen(false);
+
+      if (!res.ok || data.error) {
+        toast({
+          title: "Error",
+          description: "Failed to fully delete account. Profile removed, but auth account may remain.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Account deleted",
+          description: "Your account and profile data have been deleted.",
+          variant: "destructive",
+        });
+      }
       setTimeout(async () => {
         await signOut();
         navigate("/auth");
