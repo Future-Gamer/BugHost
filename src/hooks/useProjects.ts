@@ -1,10 +1,10 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfiles';
 import { useToast } from '@/hooks/use-toast';
-import type { TablesInsert } from '@/integrations/supabase/types';
+import type { Tables, TablesInsert } from '@/integrations/supabase/types';
 
+type Project = Tables<'projects'>;
 type ProjectInsert = TablesInsert<'projects'>;
 
 export const useProjects = () => {
@@ -12,16 +12,16 @@ export const useProjects = () => {
 
   return useQuery({
     queryKey: ['projects', profile?.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<Project[]> => {
       if (!profile?.id) return [];
       const { data, error } = await supabase
-        .from<'projects'>('projects')
+        .from('projects')
         .select('*')
         .eq('created_by', profile.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data ?? []) as Project[];
     },
     enabled: !!profile?.id,
   });
@@ -37,7 +37,7 @@ export const useCreateProject = () => {
       if (!profile?.id) throw new Error('User profile not found.');
 
       const { data, error } = await supabase
-        .from<'projects'>('projects')
+        .from('projects')
         .insert({
           ...project,
           created_by: profile.id,
