@@ -73,6 +73,7 @@ export type Database = {
           reporter: string
           reporter_id: string | null
           status: Database["public"]["Enums"]["ticket_status"]
+          team_id: string | null
           title: string
           type: Database["public"]["Enums"]["ticket_type"]
           updated_at: string
@@ -89,6 +90,7 @@ export type Database = {
           reporter: string
           reporter_id?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          team_id?: string | null
           title: string
           type?: Database["public"]["Enums"]["ticket_type"]
           updated_at?: string
@@ -105,6 +107,7 @@ export type Database = {
           reporter?: string
           reporter_id?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          team_id?: string | null
           title?: string
           type?: Database["public"]["Enums"]["ticket_type"]
           updated_at?: string
@@ -129,6 +132,13 @@ export type Database = {
             columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
@@ -219,6 +229,7 @@ export type Database = {
           id: string
           name: string
           status: Database["public"]["Enums"]["project_status"]
+          team_id: string | null
           updated_at: string
         }
         Insert: {
@@ -228,6 +239,7 @@ export type Database = {
           id?: string
           name: string
           status?: Database["public"]["Enums"]["project_status"]
+          team_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -237,6 +249,7 @@ export type Database = {
           id?: string
           name?: string
           status?: Database["public"]["Enums"]["project_status"]
+          team_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -245,6 +258,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]

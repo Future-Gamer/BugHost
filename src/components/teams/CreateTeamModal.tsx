@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ export const CreateTeamModal = ({ isOpen, onClose }: CreateTeamModalProps) => {
       {
         name: name.trim(),
         description: description.trim() || null,
+        // team creation doesn't accept team_id, just ensure structure is unchanged
       },
       {
         onSuccess: () => {

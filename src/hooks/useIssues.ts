@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -14,11 +13,11 @@ type IssueWithProfiles = Issue & {
   reporter_profile?: { first_name: string | null; last_name: string | null } | null;
 };
 
-export const useIssues = (projectId: string | null) => {
+export const useIssues = (projectId: string | null, teamId?: string | null) => {
   const { data: profile } = useProfile();
 
   return useQuery({
-    queryKey: ['issues', projectId, profile?.id],
+    queryKey: ['issues', projectId, teamId, profile?.id],
     queryFn: async () => {
       if (!profile?.id) return [];
       let query = supabase
@@ -28,16 +27,18 @@ export const useIssues = (projectId: string | null) => {
           assignee_profile:profiles!issues_assignee_id_fkey(first_name, last_name),
           reporter_profile:profiles!issues_reporter_id_fkey(first_name, last_name)
         `)
-        .eq('created_by', profile.id)
-        .order('created_at', { ascending: false });
 
-      // Only filter by project if projectId is provided
       if (projectId) {
         query = query.eq('project_id', projectId);
       }
-      
+      if (teamId) {
+        query = query.eq('team_id', teamId);
+      }
+
+      query = query.order('created_at', { ascending: false });
+
       const { data, error } = await query;
-      
+
       if (error) throw error;
       return (data || []) as IssueWithProfiles[];
     },
@@ -51,7 +52,9 @@ export const useCreateIssue = () => {
   const { data: profile } = useProfile();
 
   return useMutation({
-    mutationFn: async (issue: Omit<IssueInsert, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (
+      issue: Omit<IssueInsert, 'id' | 'created_at' | 'updated_at' | 'created_by'> & { team_id?: string | null }
+    ) => {
       if (!profile?.id) throw new Error('User profile not found.');
       const fullIssue = {
         ...issue,
@@ -62,7 +65,7 @@ export const useCreateIssue = () => {
         .insert(fullIssue)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -39,6 +38,8 @@ export const CreateIssueModal = ({ isOpen, onClose, projectId }: CreateIssueModa
       reporter: `${profile.first_name} ${profile.last_name}` || user.email || '',
       reporter_id: user.id,
       project_id: projectId,
+      // Add team_id here if you want to assign to a team (optional, needs UI update to expose)
+      // team_id: X,
     });
 
     // Reset form
