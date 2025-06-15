@@ -24,7 +24,7 @@ import {
 const navigationItems = [
   {
     title: 'Dashboard',
-    url: '/',
+    url: '/dashboard', // Updated this from '/' to '/dashboard'
     icon: Home,
   },
   {
@@ -83,3 +83,4 @@ export function AppSidebar() {
 // Export both named and default for compatibility
 export { AppSidebar as Sidebar };
 export default AppSidebar;
+
