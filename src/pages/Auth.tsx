@@ -96,23 +96,30 @@ const Auth = () => {
       const { error } = await signIn(email, password);
       if (error) {
         console.error('Sign in error:', error);
+        
+        // Provide more helpful error messages
+        let errorMessage = error.message;
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        }
+        
         toast({
-          title: "Error",
-          description: error.message,
+          title: "Sign In Failed",
+          description: errorMessage,
           variant: "destructive",
         });
       } else {
         console.log('Sign in successful');
         toast({
-          title: "Success",
-          description: "Successfully signed in!",
+          title: "Welcome back!",
+          description: "Successfully signed in.",
         });
       }
     } catch (error) {
       console.error('Unexpected sign in error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -125,20 +132,27 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting to sign up with:', email);
+      console.log('Attempting to sign up with:', email, 'firstName:', firstName, 'lastName:', lastName);
       const { error } = await signUp(email, password, firstName, lastName);
       if (error) {
         console.error('Sign up error:', error);
+        
+        // Provide more helpful error messages
+        let errorMessage = error.message;
+        if (error.message.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Please try signing in instead.';
+        }
+        
         toast({
-          title: "Error",
-          description: error.message,
+          title: "Sign Up Failed",
+          description: errorMessage,
           variant: "destructive",
         });
       } else {
         console.log('Sign up successful');
         toast({
-          title: "Success",
-          description: "Account created successfully! You can now sign in.",
+          title: "Account Created!",
+          description: "Your account has been created successfully. You can now sign in.",
         });
         // Clear form fields after successful signup
         setEmail('');
@@ -150,7 +164,7 @@ const Auth = () => {
       console.error('Unexpected sign up error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -182,6 +196,7 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    placeholder="Enter your email"
                   />
                 </div>
                 <div className="space-y-2">
@@ -192,6 +207,7 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    placeholder="Enter your password"
                   />
                 </div>
                 <div className="space-y-2">
@@ -220,6 +236,7 @@ const Auth = () => {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
+                      placeholder="First name"
                     />
                   </div>
                   <div className="space-y-2">
@@ -229,6 +246,7 @@ const Auth = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       required
+                      placeholder="Last name"
                     />
                   </div>
                 </div>
@@ -240,6 +258,7 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    placeholder="Enter your email"
                   />
                 </div>
                 <div className="space-y-2">
@@ -250,6 +269,8 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    placeholder="Create a password"
+                    minLength={6}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>

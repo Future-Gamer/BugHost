@@ -55,6 +55,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const createProfileIfMissing = async (userId: string, email: string, firstName?: string, lastName?: string) => {
+    try {
+      console.log('Checking/creating profile for user:', userId);
+      
+      // First check if profile exists
+      let { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!existingProfile) {
+        console.log('Creating missing profile for user:', userId);
+        const { data: newProfile, error } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: email,
+            first_name: firstName || '',
+            last_name: lastName || ''
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error creating profile:', error);
+          return null;
+        }
+        
+        console.log('Created new profile:', newProfile);
+        return newProfile;
+      }
+      
+      return existingProfile;
+    } catch (error) {
+      console.error('Error in createProfileIfMissing:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
@@ -66,9 +106,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          const profileData = await fetchUserProfile(session.user.id);
-          setProfile(profileData);
+          // Use setTimeout to avoid potential deadlocks
+          setTimeout(async () => {
+            let profileData = await fetchUserProfile(session.user.id);
+            
+            // If no profile found, try to create one
+            if (!profileData) {
+              profileData = await createProfileIfMissing(
+                session.user.id,
+                session.user.email || '',
+                session.user.user_metadata?.first_name,
+                session.user.user_metadata?.last_name
+              );
+            }
+            
+            setProfile(profileData);
+          }, 0);
         } else {
           setProfile(null);
         }
@@ -92,7 +145,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          const profileData = await fetchUserProfile(session.user.id);
+          let profileData = await fetchUserProfile(session.user.id);
+          
+          // If no profile found, try to create one
+          if (!profileData) {
+            profileData = await createProfileIfMissing(
+              session.user.id,
+              session.user.email || '',
+              session.user.user_metadata?.first_name,
+              session.user.user_metadata?.last_name
+            );
+          }
+          
           setProfile(profileData);
         }
         
@@ -126,6 +190,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Sign up error:', error);
     } else {
       console.log('Sign up successful:', data);
+      
+      // If user is immediately confirmed, ensure profile exists
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('User created but not confirmed yet');
+      } else if (data.user) {
+        // Create profile immediately if user is confirmed
+        setTimeout(async () => {
+          await createProfileIfMissing(
+            data.user.id,
+            email,
+            firstName,
+            lastName
+          );
+        }, 100);
+      }
     }
     
     return { error };
