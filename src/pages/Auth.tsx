@@ -21,26 +21,51 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, session } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Only redirect authenticated users, not those resetting passwords
+    console.log('Auth page - Current session:', session);
+    console.log('Auth page - Current user:', user);
+    console.log('Auth page - URL type parameter:', type);
+    
+    // Only redirect authenticated users if they're not resetting passwords
     if (user && type !== 'recovery') {
+      console.log('Redirecting authenticated user to dashboard');
       navigate('/');
     }
   }, [user, navigate, type]);
 
-  // Handle password recovery - check auth state for recovery session
+  // Handle password recovery - check for recovery session
   useEffect(() => {
     if (type === 'recovery') {
+      console.log('Password recovery mode detected');
+      
+      const checkRecoverySession = async () => {
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession();
+          console.log('Recovery session check:', session, error);
+          
+          if (session && !error) {
+            console.log('Valid recovery session found');
+          } else {
+            console.log('No valid recovery session found');
+          }
+        } catch (error) {
+          console.error('Error checking recovery session:', error);
+        }
+      };
+
+      checkRecoverySession();
+
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state change in recovery mode:', event, session);
         if (event === 'PASSWORD_RECOVERY' && session) {
-          // User has a valid recovery session, they can reset password
           console.log('Password recovery session detected');
         }
       });
+      
       return () => subscription.unsubscribe();
     }
   }, [type]);
@@ -67,15 +92,24 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      console.log('Attempting to sign in with:', email);
       const { error } = await signIn(email, password);
       if (error) {
+        console.error('Sign in error:', error);
         toast({
           title: "Error",
           description: error.message,
           variant: "destructive",
         });
+      } else {
+        console.log('Sign in successful');
+        toast({
+          title: "Success",
+          description: "Successfully signed in!",
+        });
       }
     } catch (error) {
+      console.error('Unexpected sign in error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -91,20 +125,29 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      console.log('Attempting to sign up with:', email);
       const { error } = await signUp(email, password, firstName, lastName);
       if (error) {
+        console.error('Sign up error:', error);
         toast({
           title: "Error",
           description: error.message,
           variant: "destructive",
         });
       } else {
+        console.log('Sign up successful');
         toast({
           title: "Success",
           description: "Account created successfully! You can now sign in.",
         });
+        // Clear form fields after successful signup
+        setEmail('');
+        setPassword('');
+        setFirstName('');
+        setLastName('');
       }
     } catch (error) {
+      console.error('Unexpected sign up error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
