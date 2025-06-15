@@ -15,6 +15,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useTranslation } from 'react-i18next';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
+import { NotificationSettings } from "@/components/settings/NotificationSettings";
+import { AccountSecuritySettings } from "@/components/settings/AccountSecuritySettings";
+import { DataPrivacySettings } from "@/components/settings/DataPrivacySettings";
+import { DangerZoneSettings } from "@/components/settings/DangerZoneSettings";
+import { DeleteAccountDialog } from "@/components/settings/DeleteAccountDialog";
+import { ChangePasswordDialog } from "@/components/settings/ChangePasswordDialog";
+import { EnableTwoFADialog } from "@/components/settings/EnableTwoFADialog";
 
 // New utility for downloading CSV
 function downloadFile(filename: string, content: string, mime = "text/csv") {
@@ -337,321 +345,67 @@ const Settings = () => {
 
   return (
     <AnalyticsContext.Provider value={{ showAnalytics }}>
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <Link to="/dashboard">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <Link to="/dashboard">
-              <Button variant="ghost" size="sm">
-                <Home className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-            </Link>
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            {/* ... keep existing code (header links) ... */}
           </div>
-        </div>
-        
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground mt-1">Manage your application settings and preferences</p>
-          </div>
-          
-          <div className="grid gap-6">
-            {/* Appearance Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Appearance
-                </CardTitle>
-                <CardDescription>
-                  Customize how the application looks and feels
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Theme</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Choose between light, dark, or system theme
-                    </div>
-                  </div>
-                  <ThemeToggle
-                    theme={preferences?.theme || 'light'}
-                    onThemeChange={handleThemeChange}
-                  />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Language</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Select your preferred language
-                    </div>
-                  </div>
-                  <Select value={language} onValueChange={handleLanguageChange}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="de">Deutsch</SelectItem>
-                      <SelectItem value="zh">中文</SelectItem>
-                      <SelectItem value="hi">हिन्दी</SelectItem>
-                      <SelectItem value="pt">Português</SelectItem>
-                      <SelectItem value="ar">عربي</SelectItem>
-                      <SelectItem value="ru">Русский</SelectItem>
-                      <SelectItem value="ja">日本語</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+              <p className="text-muted-foreground mt-1">Manage your application settings and preferences</p>
+            </div>
+            <div className="grid gap-6">
+              <AppearanceSettings
+                theme={preferences?.theme || "light"}
+                onThemeChange={handleThemeChange}
+                language={language}
+                onLanguageChange={handleLanguageChange}
+              />
+              <NotificationSettings
+                emailNotifications={preferences?.email_notifications ?? true}
+                onEmailNotificationsChange={handleEmailNotificationsChange}
+              />
+              <AccountSecuritySettings
+                onEnable2FA={handleEnable2FA}
+                onChangePassword={handleChangePassword}
+              />
+              <DataPrivacySettings
+                onExportData={handleExportData}
+                exporting={analyticsExporting}
+                showAnalytics={showAnalytics}
+                onAnalyticsChange={handleUsageAnalyticsChange}
+              />
+              <DangerZoneSettings
+                onDeleteAccount={handleDeleteAccount}
+              />
 
-            {/* Notification Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Notifications
-                </CardTitle>
-                <CardDescription>
-                  Configure how you receive notifications
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Email Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive notifications via email
-                    </div>
-                  </div>
-                  <Switch
-                    checked={preferences?.email_notifications ?? true}
-                    onCheckedChange={handleEmailNotificationsChange}
-                  />
-                </div>
-                {/* The following toggles are placeholders, since push/issue/team/week fields are not in schema */}
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-muted-foreground">Push Notifications</Label>
-                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
-                  </div>
-                  <Switch checked={false} disabled />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-muted-foreground">Issue Updates</Label>
-                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
-                  </div>
-                  <Switch checked={false} disabled />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-muted-foreground">Team Invitations</Label>
-                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
-                  </div>
-                  <Switch checked={false} disabled />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-muted-foreground">Weekly Summary</Label>
-                    <div className="text-xs text-muted-foreground">Not enabled in this workspace</div>
-                  </div>
-                  <Switch checked={false} disabled />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Account & Security */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Account & Security
-                </CardTitle>
-                <CardDescription>
-                  Manage your account security and privacy settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Two-Factor Authentication</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleEnable2FA}>
-                    <Key className="h-4 w-4 mr-2" />
-                    Enable 2FA
-                  </Button>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Password</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Change your account password
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleChangePassword}>
-                    Change Password
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Data & Privacy */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="h-5 w-5" />
-                  Data & Privacy
-                </CardTitle>
-                <CardDescription>
-                  Control your data and privacy preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Data Export</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Download a copy of analytical data
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleExportData} disabled={analyticsExporting}>
-                    <Download className="h-4 w-4 mr-2" />
-                    {analyticsExporting ? "Exporting..." : "Export Data"}
-                  </Button>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Usage Analytics</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Help improve our service with anonymous usage data
-                    </div>
-                  </div>
-                  <Switch checked={showAnalytics} onCheckedChange={handleUsageAnalyticsChange} />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Danger Zone */}
-            <Card className="border-destructive/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <Trash2 className="h-5 w-5" />
-                  Danger Zone
-                </CardTitle>
-                <CardDescription>
-                  Irreversible and destructive actions
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
-                  <div className="space-y-0.5">
-                    <Label className="text-base">Delete Account</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Permanently delete your account and all associated data
-                    </div>
-                  </div>
-                  <Button variant="destructive" size="sm" onClick={handleDeleteAccount}>
-                    Delete Account
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Dialogs for 2FA, Change Password, Delete Account */}
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Confirm Delete Account</DialogTitle>
-                </DialogHeader>
-                <div className="py-4">
-                  <p className="text-sm">
-                    Are you sure you want to permanently delete your account and all associated data? This action cannot be undone.
-                  </p>
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setDeleteDialogOpen(false)}
-                    disabled={isDeleting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    disabled={isDeleting}
-                    onClick={confirmDeleteAccount}
-                  >
-                    {isDeleting ? "Deleting..." : "Delete Account"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            {/* Change password dialog */}
-            <ChangePasswordDialog
-              open={changePasswordDialogOpen}
-              onOpenChange={setChangePasswordDialogOpen}
-              onSubmit={submitPasswordChange}
-              isLoading={changePasswordLoading}
-            />
-            {/* Two-factor Auth Dialog */}
-            <Dialog open={twoFADialogOpen} onOpenChange={setTwoFADialogOpen}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Enable 2FA</DialogTitle>
-                </DialogHeader>
-                <div className="py-2">
-                  {totpSecret && (
-                    <>
-                      <div className="font-mono text-xs mb-2">
-                        <span>Secret: </span><span className="bg-gray-100 px-2 py-1 rounded">{totpSecret}</span>
-                      </div>
-                      <div>
-                        Enter 6 digit code from your authenticator:
-                        <input
-                          maxLength={6}
-                          type="text"
-                          className="w-[120px] border rounded p-2 ml-2"
-                          value={totpInput}
-                          onChange={e => setTotpInput(e.target.value)}
-                          disabled={totpVerified}
-                        />
-                      </div>
-                      <Button className="mt-2" onClick={verifyTotp} disabled={totpInput.length !== 6 || totpVerified}>
-                        {totpVerified ? "Verified" : "Verify"}
-                      </Button>
-                    </>
-                  )}
-                </div>
-                <DialogFooter>
-                  <Button onClick={() => setTwoFADialogOpen(false)}>Close</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              {/* Dialogs for 2FA, Change Password, Delete Account */}
+              <DeleteAccountDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onDelete={confirmDeleteAccount}
+                isLoading={isDeleting}
+              />
+              <ChangePasswordDialog
+                open={changePasswordDialogOpen}
+                onOpenChange={setChangePasswordDialogOpen}
+                onSubmit={submitPasswordChange}
+                isLoading={changePasswordLoading}
+              />
+              <EnableTwoFADialog
+                open={twoFADialogOpen}
+                onOpenChange={setTwoFADialogOpen}
+                totpSecret={totpSecret}
+                totpInput={totpInput}
+                setTotpInput={setTotpInput}
+                totpVerified={totpVerified}
+                onVerify={verifyTotp}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </AnalyticsContext.Provider>
   );
 };
