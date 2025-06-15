@@ -22,11 +22,6 @@ import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isCreateProjectModalOpen, setCreateProjectModalOpen] = React.useState(false);
-
-  const handleOpenCreateProject = () => setCreateProjectModalOpen(true);
-  const handleCloseCreateProject = () => setCreateProjectModalOpen(false);
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -49,13 +44,9 @@ const App = () => {
               <Route path="/projects" element={
                 <ProtectedRoute>
                   <SidebarProvider>
-                    <AppLayout onCreateProject={handleOpenCreateProject}>
+                    <AppLayout>
                       <Projects />
                     </AppLayout>
-                    <CreateProjectModal
-                      isOpen={isCreateProjectModalOpen}
-                      onClose={handleCloseCreateProject}
-                    />
                   </SidebarProvider>
                 </ProtectedRoute>
               } />

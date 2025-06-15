@@ -8,6 +8,7 @@ import { projectFilterGroups } from '@/components/projects/ProjectList';
 import { issueFilterGroups } from '@/components/issues/IssueBoard';
 import { teamMemberFilterGroups } from '@/components/teams/TeamMembersList';
 import { CreateIssueModal } from '@/components/issues/CreateIssueModal';
+import { CreateProjectModal } from '@/components/projects/CreateProjectModal';
 
 interface FilterProps {
   selectedFilters: Record<string, string[]>;
@@ -18,6 +19,7 @@ interface FilterProps {
 interface AppLayoutProps {
   children: ReactNode | ((props: FilterProps) => ReactNode);
   selectedProject?: {id: string; name: string} | null;
+  // onCreateProject and onCreateIssue props should be optional, but we'll handle modal locally now
   onCreateProject?: () => void;
   onCreateIssue?: () => void;
 }
@@ -25,12 +27,18 @@ interface AppLayoutProps {
 export const AppLayout = ({ 
   children, 
   selectedProject, 
-  onCreateProject = () => {}, 
+  // handlers can be provided but we'll use local
+  onCreateProject, 
   onCreateIssue = () => {} 
 }: AppLayoutProps) => {
   const location = useLocation();
   const [isCreateIssueModalOpen, setIsCreateIssueModalOpen] = useState(false);
-  
+
+  // MODAL STATE for project creation, now handled here
+  const [isCreateProjectModalOpen, setCreateProjectModalOpen] = useState(false);
+  const handleOpenCreateProject = () => setCreateProjectModalOpen(true);
+  const handleCloseCreateProject = () => setCreateProjectModalOpen(false);
+
   // Determine which filter groups to use based on current route
   const getFilterGroups = () => {
     if (location.pathname === '/projects') {
@@ -60,7 +68,7 @@ export const AppLayout = ({
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopNav 
           selectedProject={selectedProject || null}
-          onCreateProject={onCreateProject}
+          onCreateProject={handleOpenCreateProject} // Always passes handler
           onCreateIssue={handleCreateIssue}
           filterGroups={filterGroups}
           selectedFilters={selectedFilters}
@@ -86,6 +94,11 @@ export const AppLayout = ({
           projectId={selectedProject.id}
         />
       )}
+      {/* Create Project Modal - Always available */}
+      <CreateProjectModal
+        isOpen={isCreateProjectModalOpen}
+        onClose={handleCloseCreateProject}
+      />
     </div>
   );
 };
