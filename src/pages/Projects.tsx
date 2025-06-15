@@ -11,8 +11,8 @@ const Projects = () => {
   const { data: projects, isLoading } = useProjects();
 
   const handleSelectProject = (projectId: string, projectName: string) => {
-    // Navigate to the dashboard with project selected
-    navigate('/', { state: { selectedProject: { id: projectId, name: projectName } } });
+    // Navigate to the dashboard with project selected (FIXED: use /dashboard)
+    navigate('/dashboard', { state: { selectedProject: { id: projectId, name: projectName } } });
   };
 
   return (
@@ -34,3 +34,4 @@ const Projects = () => {
 };
 
 export default Projects;
+
