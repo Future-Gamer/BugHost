@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Users, Calendar } from "lucide-react";
 import { useTeams, useDeleteTeam } from "@/hooks/useTeams";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateTeamModal } from "@/components/teams/CreateTeamModal";
 import {
@@ -26,6 +28,78 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+const TeamCard = ({ team }: { team: any }) => {
+  const { data: teamMembers = [] } = useTeamMembers(team.id);
+  const activeMembersCount = teamMembers.filter(member => member.status === 'active').length;
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Users className="h-5 w-5 text-blue-600" />
+            <Badge variant="default" className="text-xs">
+              Active
+            </Badge>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => window.location.href = `/teams/${team.id}/members`}
+              >
+                View Members
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // This will be handled by parent component
+                }}
+                className="text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Team
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        <CardTitle 
+          className="text-lg cursor-pointer hover:text-blue-600"
+          onClick={() => window.location.href = `/teams/${team.id}/members`}
+        >
+          {team.name}
+        </CardTitle>
+        <CardDescription className="text-sm">
+          {team.description}
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent>
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              <Users className="h-4 w-4" />
+              <span>{activeMembersCount} members</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Calendar className="h-4 w-4" />
+            <span>{new Date(team.created_at).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Teams = () => {
   const { data: teams, isLoading, error } = useTeams();
@@ -148,70 +222,9 @@ const Teams = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teams?.map((team) => (
-              <Card 
-                key={team.id} 
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-5 w-5 text-blue-600" />
-                      <Badge variant="default" className="text-xs">
-                        Active
-                      </Badge>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => window.location.href = `/teams/${team.id}/members`}
-                        >
-                          View Members
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => setTeamToDelete({ id: team.id, name: team.name })}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Team
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  
-                  <CardTitle 
-                    className="text-lg cursor-pointer hover:text-blue-600"
-                    onClick={() => window.location.href = `/teams/${team.id}/members`}
-                  >
-                    {team.name}
-                  </CardTitle>
-                  <CardDescription className="text-sm">
-                    {team.description}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>0 members</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(team.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={team.id} onClick={() => setTeamToDelete({ id: team.id, name: team.name })}>
+                <TeamCard team={team} />
+              </div>
             ))}
 
             {teams?.length === 0 && (

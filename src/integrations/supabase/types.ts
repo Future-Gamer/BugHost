@@ -386,7 +386,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_project_notification: {
+        Args: {
+          p_project_id: string
+          p_title: string
+          p_message: string
+          p_type?: string
+          p_exclude_user_id?: string
+        }
+        Returns: undefined
+      }
+      create_team_notification: {
+        Args: {
+          p_team_id: string
+          p_title: string
+          p_message: string
+          p_type?: string
+          p_exclude_user_id?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       issue_priority: "low" | "medium" | "high" | "urgent"
