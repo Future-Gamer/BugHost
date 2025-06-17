@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FolderOpen, Users, Bug, Calendar, MoreHorizontal, Trash } from "lucide-react";
 import { useIssues } from "@/hooks/useIssues";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,9 @@ interface ProjectCardProps {
 
 export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: ProjectCardProps) => {
   const { data: issues = [] } = useIssues(project.id);
+  const { data: teamMembers = [] } = useTeamMembers(project.team_id);
   const issueCount = issues.length;
+  const teamMemberCount = teamMembers.length;
 
   return (
     <Card 
@@ -74,7 +77,7 @@ export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: Proje
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
               <Users className="h-4 w-4" />
-              <span>5</span>
+              <span>{teamMemberCount}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Bug className="h-4 w-4" />
