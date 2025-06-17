@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,16 +7,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Home, User, Mail, Calendar, Edit3, Save, X, Users, MapPin, Phone, Briefcase, Clock } from 'lucide-react';
+import { ArrowLeft, Home, User, Mail, Calendar, Edit3, Save, X, Users, Bug, CheckCircle, Clock, Target } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeams } from '@/hooks/useTeams';
+import { useUserStats } from '@/hooks/useUserStats';
 
 const Profile = () => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { data: teams = [] } = useTeams();
+  const { data: userStats } = useUserStats();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: profile?.first_name || '',
@@ -64,6 +64,19 @@ const Profile = () => {
         return 'outline';
       default:
         return 'secondary';
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'done':
+        return 'default';
+      case 'in_progress':
+        return 'secondary';
+      case 'todo':
+        return 'outline';
+      default:
+        return 'outline';
     }
   };
 
@@ -137,7 +150,7 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* Profile Details */}
+          {/* Personal Information and Account Status */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -270,12 +283,61 @@ const Profile = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Teams</span>
                   <span className="text-sm text-muted-foreground">
-                    {userTeams.length} teams
+                    {userStats?.totalTeams || 0} teams
                   </span>
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* User Issues */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bug className="h-5 w-5" />
+                My Issues
+                <Badge variant="secondary">{userStats?.totalIssues || 0}</Badge>
+              </CardTitle>
+              <CardDescription>
+                Issues you've created or are assigned to
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!userStats?.userIssues?.length ? (
+                <div className="text-center py-8">
+                  <Bug className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No issues found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You haven't created or been assigned any issues yet
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {userStats.userIssues.slice(0, 5).map((issue: any) => (
+                    <div key={issue.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Bug className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <h4 className="font-medium">{issue.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {issue.type?.charAt(0).toUpperCase() + issue.type?.slice(1)} • {issue.priority}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={getStatusBadgeVariant(issue.status)}>
+                        {issue.status}
+                      </Badge>
+                    </div>
+                  ))}
+                  {userStats.userIssues.length > 5 && (
+                    <p className="text-sm text-muted-foreground text-center pt-2">
+                      And {userStats.userIssues.length - 5} more issues...
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Team Memberships */}
           <Card>
@@ -338,7 +400,7 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* Activity Summary */}
+          {/* Activity Summary with Real Data */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -352,19 +414,27 @@ const Profile = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">12</div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {userStats?.totalProjects || 0}
+                  </div>
                   <div className="text-sm text-muted-foreground">Projects</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">45</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {userStats?.resolvedIssues || 0}
+                  </div>
                   <div className="text-sm text-muted-foreground">Issues Resolved</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{userTeams.length}</div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {userStats?.totalTeams || 0}
+                  </div>
                   <div className="text-sm text-muted-foreground">Teams</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">28</div>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {userStats?.daysActive || 0}
+                  </div>
                   <div className="text-sm text-muted-foreground">Days Active</div>
                 </div>
               </div>
