@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const TeamCard = ({ team }: { team: any }) => {
+const TeamCard = ({ team, onDeleteClick }: { team: any; onDeleteClick: (team: { id: string; name: string }) => void }) => {
   const { data: teamMembers = [] } = useTeamMembers(team.id);
   const activeMembersCount = teamMembers.filter(member => member.status === 'active').length;
 
@@ -61,7 +61,7 @@ const TeamCard = ({ team }: { team: any }) => {
               <DropdownMenuItem 
                 onClick={(e) => {
                   e.stopPropagation();
-                  // This will be handled by parent component
+                  onDeleteClick({ id: team.id, name: team.name });
                 }}
                 className="text-red-600"
               >
@@ -116,7 +116,7 @@ const Teams = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link to="/dashboard">
@@ -153,7 +153,7 @@ const Teams = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link to="/dashboard">
@@ -187,7 +187,7 @@ const Teams = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link to="/dashboard">
@@ -222,9 +222,11 @@ const Teams = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teams?.map((team) => (
-              <div key={team.id} onClick={() => setTeamToDelete({ id: team.id, name: team.name })}>
-                <TeamCard team={team} />
-              </div>
+              <TeamCard 
+                key={team.id} 
+                team={team} 
+                onDeleteClick={setTeamToDelete}
+              />
             ))}
 
             {teams?.length === 0 && (
