@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 
@@ -5,7 +6,12 @@ import { cn } from "@/lib/utils"
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & {
+    checked?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+    disabled?: boolean;
+    className?: string;
+  }
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(
