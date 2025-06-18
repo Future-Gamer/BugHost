@@ -157,6 +157,89 @@ declare global {
   interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
   }
+
+  // Badge component types
+  interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    variant?: 'default' | 'secondary' | 'destructive' | 'outline';
+  }
+
+  // Button component types
+  interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+    size?: 'default' | 'sm' | 'lg' | 'icon';
+    asChild?: boolean;
+  }
+
+  // Dropdown menu types
+  interface DropdownMenuTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    asChild?: boolean;
+    className?: string;
+  }
+
+  interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    align?: 'start' | 'center' | 'end';
+  }
+
+  interface DropdownMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+  }
+
+  // Avatar types
+  interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AvatarFallbackProps extends React.HTMLAttributes<HTMLSpanElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  // Alert Dialog types
+  interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AlertDialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AlertDialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AlertDialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AlertDialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AlertDialogActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+  }
+
+  interface AlertDialogCancelProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 export {};

@@ -55,6 +55,76 @@ declare module '@/components/ui/textarea' {
   }
 }
 
+declare module '@/components/ui/dropdown-menu' {
+  export interface DropdownMenuTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    asChild?: boolean;
+    className?: string;
+  }
+
+  export interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    align?: 'start' | 'center' | 'end';
+  }
+
+  export interface DropdownMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+  }
+}
+
+declare module '@/components/ui/avatar' {
+  export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLSpanElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@/components/ui/alert-dialog' {
+  export interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AlertDialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AlertDialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AlertDialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AlertDialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  export interface AlertDialogActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+  }
+
+  export interface AlertDialogCancelProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
 declare module 'lucide-react' {
   export interface LucideProps {
     size?: number;
