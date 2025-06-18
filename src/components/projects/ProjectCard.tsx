@@ -18,9 +18,10 @@ interface ProjectCardProps {
     status?: string;
   };
   onSelectProject: (projectId: string, projectName: string) => void;
+  onDeleteProject?: (project: { id: string; name: string }) => void;
 }
 
-export const ProjectCard = ({ project, onSelectProject }: ProjectCardProps) => {
+export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: ProjectCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const deleteProject = useDeleteProject();
   const { toast } = useToast();
@@ -30,7 +31,11 @@ export const ProjectCard = ({ project, onSelectProject }: ProjectCardProps) => {
   };
 
   const handleDeleteClick = () => {
-    setShowDeleteDialog(true);
+    if (onDeleteProject) {
+      onDeleteProject({ id: project.id, name: project.name });
+    } else {
+      setShowDeleteDialog(true);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -50,14 +55,18 @@ export const ProjectCard = ({ project, onSelectProject }: ProjectCardProps) => {
     }
   };
 
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <>
       <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleCardClick}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-lg font-medium">{project.name}</CardTitle>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0" onClick={handleMenuClick}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

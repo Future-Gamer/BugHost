@@ -91,6 +91,7 @@ declare global {
   interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
     children?: React.ReactNode;
     className?: string;
+    htmlFor?: string;
   }
 
   // Select component types
