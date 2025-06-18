@@ -193,9 +193,20 @@ declare global {
     onClick?: () => void;
   }
 
+  interface DropdownMenuLabelProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
   // Avatar types
   interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
     children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+    src?: string;
+    alt?: string;
     className?: string;
   }
 
@@ -234,10 +245,19 @@ declare global {
     children?: React.ReactNode;
     className?: string;
     onClick?: () => void;
+    disabled?: boolean;
   }
 
   interface AlertDialogCancelProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children?: React.ReactNode;
+    className?: string;
+  }
+
+  // Switch component types
+  interface SwitchProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    checked?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+    disabled?: boolean;
     className?: string;
   }
 }

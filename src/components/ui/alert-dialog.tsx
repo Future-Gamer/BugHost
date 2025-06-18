@@ -130,6 +130,7 @@ const AlertDialogAction = React.forwardRef<
     children?: React.ReactNode;
     className?: string;
     onClick?: () => void;
+    disabled?: boolean;
   }
 >(({ className, children, ...props }, ref) => (
   <AlertDialogPrimitive.Action
