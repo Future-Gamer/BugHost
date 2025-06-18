@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ProjectList } from "@/components/projects/ProjectList";
-import { IssueBoard } from "@/components/issues/IssueBoard";
+import { DraggableIssueBoard } from "@/components/issues/DraggableIssueBoard";
 import { AnalyticsOverview } from "@/components/analytics/AnalyticsOverview";
 import { CreateIssueModal } from "@/components/issues/CreateIssueModal";
 import { useProjects } from "@/hooks/useProjects";
@@ -61,14 +61,12 @@ const Index = ({ selectedFilters = {}, onFilterChange, onClearFilters }: IndexPr
           onClearFilters={onClearFilters}
         />
       ) : (
-        <IssueBoard 
+        <DraggableIssueBoard 
           projectId={selectedProject?.id || null}
           projectName={selectedProject?.name}
           onCreateIssue={handleCreateIssue}
           onBackToProjects={handleBackToProjects}
           selectedFilters={selectedFilters}
-          onFilterChange={onFilterChange}
-          onClearFilters={onClearFilters}
         />
       )}
 

@@ -43,7 +43,7 @@ export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: Proje
                 variant="ghost" 
                 size="sm" 
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -51,7 +51,7 @@ export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: Proje
             <DropdownMenuContent>
               <DropdownMenuItem 
                 className="text-red-600 focus:text-red-600"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
                   onDeleteProject({ id: project.id, name: project.name });
                 }}

@@ -13,8 +13,8 @@ const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
     VariantProps<typeof labelVariants> & {
+      className?: string;
       children?: React.ReactNode;
-      htmlFor?: string;
     }
 >(({ className, children, ...props }, ref) => (
   <LabelPrimitive.Root

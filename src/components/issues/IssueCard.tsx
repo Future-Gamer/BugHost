@@ -19,7 +19,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { StatusDropdown } from "./StatusDropdown";
 import { useUpdateIssue } from "@/hooks/useIssues";
 import { MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -34,7 +33,7 @@ interface Issue {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'todo' | 'inprogress' | 'done';
   assignee?: string;
-  assignee_profile?: { first_name: string | null; last_name: string | null } | null;
+  assignee_profile?: { first_name: string | null; last_name: string | null; email?: string | null } | null;
   created_at: string;
 }
 
@@ -43,17 +42,9 @@ interface IssueCardProps {
 }
 
 export const IssueCard = ({ issue }: IssueCardProps) => {
-  const { mutate: updateIssue } = useUpdateIssue();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  const handleStatusChange = (newStatus: 'todo' | 'inprogress' | 'done') => {
-    updateIssue({
-      id: issue.id,
-      updates: { status: newStatus }
-    });
-  };
 
   const handleDeleteIssue = async () => {
     try {
@@ -107,6 +98,13 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
     return issue.assignee || 'Unassigned';
   };
 
+  const getAssigneeEmail = () => {
+    if (issue.assignee_profile?.email) {
+      return issue.assignee_profile.email;
+    }
+    return null;
+  };
+
   const getInitials = (name: string) => {
     if (name === 'Unassigned') return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -114,7 +112,7 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
 
   return (
     <>
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <h4 className="font-medium text-sm leading-tight flex-1">{issue.title}</h4>
@@ -147,20 +145,18 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
             <p className="text-sm text-gray-600 line-clamp-2">{issue.description}</p>
           )}
           
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-6 w-6">
-                <AvatarFallback className="text-xs">
-                  {getInitials(getAssigneeName())}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-xs text-gray-600">{getAssigneeName()}</span>
+          <div className="flex items-start space-x-2">
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className="text-xs">
+                {getInitials(getAssigneeName())}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <span className="text-xs text-gray-900 font-medium block">{getAssigneeName()}</span>
+              {getAssigneeEmail() && (
+                <span className="text-xs text-gray-500 block truncate">{getAssigneeEmail()}</span>
+              )}
             </div>
-            
-            <StatusDropdown 
-              status={issue.status}
-              onStatusChange={handleStatusChange}
-            />
           </div>
         </CardContent>
       </Card>
