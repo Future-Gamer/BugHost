@@ -19,11 +19,17 @@ declare global {
     type FocusEvent<T = Element> = import('react').FocusEvent<T>;
     type ChangeEvent<T = Element> = import('react').ChangeEvent<T>;
     type ClipboardEvent<T = Element> = import('react').ClipboardEvent<T>;
+    type FormEvent<T = Element> = import('react').FormEvent<T>;
+    type HTMLAttributes<T> = import('react').HTMLAttributes<T>;
+    type InputHTMLAttributes<T> = import('react').InputHTMLAttributes<T>;
+    type TextareaHTMLAttributes<T> = import('react').TextareaHTMLAttributes<T>;
+    type ButtonHTMLAttributes<T> = import('react').ButtonHTMLAttributes<T>;
+    type LabelHTMLAttributes<T> = import('react').LabelHTMLAttributes<T>;
+    type ElementRef<T extends React.ElementType> = import('react').ComponentRef<T>;
+    type ComponentPropsWithoutRef<T extends React.ElementType> = import('react').PropsWithoutRef<import('react').ComponentProps<T>>;
 
     interface FC<P = {}> extends FunctionComponent<P> {}
-    interface FormEvent<T = Element> extends SyntheticEvent<T> {}
     interface ElementRef<T> extends Ref<T> {}
-    interface ComponentPropsWithoutRef<T> extends PropsWithoutRef<ComponentProps<T>> {}
     
     const useState: typeof import('react').useState;
     const useEffect: typeof import('react').useEffect;
@@ -53,6 +59,103 @@ declare global {
     interface ElementAttributesProperty { props: {}; }
     interface ElementChildrenAttribute { children: {}; }
     interface LibraryManagedAttributes<C, P> extends React.LibraryManagedAttributes<C, P> {}
+  }
+
+  // Lucide React icon props
+  interface LucideProps {
+    size?: number;
+    color?: string;
+    strokeWidth?: number;
+    absoluteStrokeWidth?: boolean;
+    className?: string;
+    style?: React.CSSProperties;
+  }
+
+  // Dialog component types
+  interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  // Label component types  
+  interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+    children?: React.ReactNode;
+    className?: string;
+    htmlFor?: string;
+  }
+
+  // Select component types
+  interface SelectTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    value?: string;
+  }
+
+  interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> {
+    placeholder?: string;
+    className?: string;
+  }
+
+  // Input and Textarea props
+  interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    className?: string;
+  }
+
+  interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+    className?: string;
+    id?: string;
+    rows?: number;
+  }
+
+  // Card component types
+  interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  // Skeleton component
+  interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+    className?: string;
   }
 }
 
