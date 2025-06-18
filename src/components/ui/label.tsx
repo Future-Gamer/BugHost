@@ -15,6 +15,7 @@ const Label = React.forwardRef<
     VariantProps<typeof labelVariants> & {
       children?: React.ReactNode;
       htmlFor?: string;
+      className?: string;
     }
 >(({ className, children, ...props }, ref) => (
   <LabelPrimitive.Root

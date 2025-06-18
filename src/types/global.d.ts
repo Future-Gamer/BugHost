@@ -216,6 +216,10 @@ declare global {
   }
 
   // Alert Dialog types
+  interface AlertDialogOverlayProps extends React.HTMLAttributes<HTMLDivElement> {
+    className?: string;
+  }
+
   interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: React.ReactNode;
     className?: string;
@@ -275,6 +279,11 @@ declare global {
   }
 
   interface AccordionContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AccordionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: React.ReactNode;
     className?: string;
   }
