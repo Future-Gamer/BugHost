@@ -91,7 +91,6 @@ declare global {
   interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
     children?: React.ReactNode;
     className?: string;
-    htmlFor?: string;
   }
 
   // Select component types
@@ -258,6 +257,24 @@ declare global {
     checked?: boolean;
     onCheckedChange?: (checked: boolean) => void;
     disabled?: boolean;
+    className?: string;
+  }
+
+  // Accordion component types
+  interface AccordionItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+    className?: string;
+    value: string;
+    disabled?: boolean;
+  }
+
+  interface AccordionTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children?: React.ReactNode;
+    className?: string;
+  }
+
+  interface AccordionContentProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
     className?: string;
   }
 }
