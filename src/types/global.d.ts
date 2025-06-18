@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-// Global type definitions for UI components
-declare global {
-  // Add any truly global types here if needed in the future
-=======
 
 // Global type definitions for UI components
 declare global {
@@ -394,7 +389,6 @@ declare global {
     children?: React.ReactNode;
     className?: string;
   }
->>>>>>> 8425bc99bdc9f9e3bdc2a51893e475fc5fdb78d0
 }
 
 export {};
