@@ -63,6 +63,7 @@ export type Database = {
       issues: {
         Row: {
           assignee: string | null
+          assignee_email: string | null
           assignee_id: string | null
           created_at: string
           created_by: string | null
@@ -80,6 +81,7 @@ export type Database = {
         }
         Insert: {
           assignee?: string | null
+          assignee_email?: string | null
           assignee_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -97,6 +99,7 @@ export type Database = {
         }
         Update: {
           assignee?: string | null
+          assignee_email?: string | null
           assignee_id?: string | null
           created_at?: string
           created_by?: string | null

@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useUpdateIssue } from "@/hooks/useIssues";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, Mail } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +33,7 @@ interface Issue {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'todo' | 'inprogress' | 'done';
   assignee?: string;
+  assignee_email?: string | null;
   assignee_profile?: { first_name: string | null; last_name: string | null; email?: string | null } | null;
   created_at: string;
 }
@@ -66,6 +67,7 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
         });
         // Invalidate and refetch issues
         queryClient.invalidateQueries({ queryKey: ['issues'] });
+        queryClient.invalidateQueries({ queryKey: ['issue-count'] });
       }
     } catch (error) {
       toast({
@@ -99,8 +101,12 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
   };
 
   const getAssigneeEmail = () => {
+    // Priority: assignee_profile.email > assignee_email > null
     if (issue.assignee_profile?.email) {
       return issue.assignee_profile.email;
+    }
+    if (issue.assignee_email) {
+      return issue.assignee_email;
     }
     return null;
   };
@@ -109,6 +115,8 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
     if (name === 'Unassigned') return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
+
+  const assigneeEmail = getAssigneeEmail();
 
   return (
     <>
@@ -153,8 +161,11 @@ export const IssueCard = ({ issue }: IssueCardProps) => {
             </Avatar>
             <div className="flex-1 min-w-0">
               <span className="text-xs text-gray-900 font-medium block">{getAssigneeName()}</span>
-              {getAssigneeEmail() && (
-                <span className="text-xs text-gray-500 block truncate">{getAssigneeEmail()}</span>
+              {assigneeEmail && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Mail className="h-3 w-3 text-gray-400" />
+                  <span className="text-xs text-gray-500 truncate">{assigneeEmail}</span>
+                </div>
               )}
             </div>
           </div>
