@@ -39,10 +39,25 @@ export const useAddTeamMember = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (member: Omit<TeamMemberInsert, 'id' | 'joined_at'>) => {
+    mutationFn: async (member: Omit<TeamMemberInsert, 'id' | 'joined_at'> & { 
+      member_name?: string; 
+      member_email?: string; 
+    }) => {
+      // If we have member details but no user_id, we'll create a placeholder record
+      // In a real application, you might want to create an invitation instead
+      const memberData = {
+        team_id: member.team_id,
+        user_id: member.user_id,
+        role: member.role,
+        status: member.status || 'pending',
+        // Store member details as metadata if no user_id
+        ...(member.member_name && { member_name: member.member_name }),
+        ...(member.member_email && { member_email: member.member_email }),
+      };
+
       const { data, error } = await supabase
         .from('team_members')
-        .insert(member)
+        .insert(memberData)
         .select()
         .single();
       
