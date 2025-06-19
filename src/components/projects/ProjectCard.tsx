@@ -5,8 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, FileText } from 'lucide-react';
 import { useDeleteProject } from '@/hooks/useDeleteProject';
+import { useIssueCount } from '@/hooks/useIssues';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProjectCardProps {
@@ -24,6 +25,7 @@ interface ProjectCardProps {
 export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: ProjectCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const deleteProject = useDeleteProject();
+  const { data: issueCount = 0 } = useIssueCount(project.id);
   const { toast } = useToast();
 
   const handleCardClick = () => {
@@ -83,9 +85,15 @@ export const ProjectCard = ({ project, onSelectProject, onDeleteProject }: Proje
             {project.description || 'No description available'}
           </CardDescription>
           <div className="flex items-center justify-between">
-            <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-              {project.status || 'Active'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
+                {project.status || 'Active'}
+              </Badge>
+              <div className="flex items-center gap-1 text-sm text-gray-600">
+                <FileText className="h-4 w-4" />
+                <span>{issueCount} issues</span>
+              </div>
+            </div>
             <span className="text-sm text-gray-500">
               {new Date(project.created_at).toLocaleDateString()}
             </span>

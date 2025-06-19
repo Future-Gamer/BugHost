@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export const CreateIssueModal = ({ isOpen, onClose, projectId }: CreateIssueModa
   const [type, setType] = useState<'bug' | 'feature' | 'task'>('bug');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
   const [assignee, setAssignee] = useState('');
+  const [assigneeEmail, setAssigneeEmail] = useState('');
   
   const createIssue = useCreateIssue();
   const { user, profile } = useAuth();
@@ -35,11 +37,10 @@ export const CreateIssueModal = ({ isOpen, onClose, projectId }: CreateIssueModa
       type,
       priority,
       assignee: assignee || null,
+      assignee_email: assigneeEmail || null,
       reporter: `${profile.first_name} ${profile.last_name}` || user.email || '',
       reporter_id: user.id,
       project_id: projectId,
-      // Add team_id here if you want to assign to a team (optional, needs UI update to expose)
-      // team_id: X,
     });
 
     // Reset form
@@ -48,6 +49,7 @@ export const CreateIssueModal = ({ isOpen, onClose, projectId }: CreateIssueModa
     setType('bug');
     setPriority('medium');
     setAssignee('');
+    setAssigneeEmail('');
     onClose();
   };
 
@@ -113,12 +115,23 @@ export const CreateIssueModal = ({ isOpen, onClose, projectId }: CreateIssueModa
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="assignee">Assignee</Label>
+            <Label htmlFor="assignee">Assignee Name</Label>
             <Input
               id="assignee"
               value={assignee}
               onChange={(e) => setAssignee(e.target.value)}
               placeholder="Enter assignee name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="assigneeEmail">Assignee Email</Label>
+            <Input
+              id="assigneeEmail"
+              type="email"
+              value={assigneeEmail}
+              onChange={(e) => setAssigneeEmail(e.target.value)}
+              placeholder="Enter assignee email"
             />
           </div>
 
