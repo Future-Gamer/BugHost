@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { useProfiles } from '@/hooks/useProfiles';
 import { useAddTeamMember } from '@/hooks/useTeamMembers';
 import { UserPlus } from 'lucide-react';
 
@@ -14,31 +15,26 @@ interface AddTeamMemberModalProps {
 }
 
 export const AddTeamMemberModal = ({ isOpen, onClose, teamId }: AddTeamMemberModalProps) => {
-  const [memberName, setMemberName] = useState('');
-  const [memberEmail, setMemberEmail] = useState('');
-  const [memberRole, setMemberRole] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'manager' | 'developer' | 'tester'>('developer');
 
+  const { data: profiles = [], isLoading: profilesLoading } = useProfiles();
   const { mutate: addTeamMember, isPending } = useAddTeamMember();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!memberName.trim() || !memberEmail.trim() || !memberRole.trim()) return;
+    if (!selectedUserId) return;
 
-    // For now, we'll create a team member record with the provided information
-    // In a real application, you might want to create a user account first or handle existing users
     addTeamMember({
       team_id: teamId,
-      user_id: null, // We'll handle this differently since we're not selecting from existing users
-      role: memberRole as 'admin' | 'manager' | 'developer' | 'tester',
-      status: 'pending', // Set as pending since this is a new invitation
-      member_name: memberName,
-      member_email: memberEmail,
+      user_id: selectedUserId,
+      role: selectedRole,
+      status: 'active',
     }, {
       onSuccess: () => {
         onClose();
-        setMemberName('');
-        setMemberEmail('');
-        setMemberRole('');
+        setSelectedUserId('');
+        setSelectedRole('developer');
       },
     });
   };
@@ -47,56 +43,51 @@ export const AddTeamMemberModal = ({ isOpen, onClose, teamId }: AddTeamMemberMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Add Team Member
-          </DialogTitle>
+          <DialogTitle>Add Team Member</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Enter full name"
-              value={memberName}
-              onChange={(e) => setMemberName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter email address"
-              value={memberEmail}
-              onChange={(e) => setMemberEmail(e.target.value)}
-              required
-            />
+            <Label htmlFor="user">Select User</Label>
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a user to add" />
+              </SelectTrigger>
+              <SelectContent>
+                {profilesLoading ? (
+                  <SelectItem value="" disabled>Loading users...</SelectItem>
+                ) : (
+                  profiles.map((profile) => (
+                    <SelectItem key={profile.id} value={profile.id}>
+                      {profile.first_name && profile.last_name 
+                        ? `${profile.first_name} ${profile.last_name}` 
+                        : profile.email}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
-            <Input
-              id="role"
-              type="text"
-              placeholder="Enter role (e.g., developer, manager, admin, tester)"
-              value={memberRole}
-              onChange={(e) => setMemberRole(e.target.value)}
-              required
-            />
+            <Select value={selectedRole} onValueChange={(value: 'admin' | 'manager' | 'developer' | 'tester') => setSelectedRole(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="developer">Developer</SelectItem>
+                <SelectItem value="tester">Tester</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              disabled={!memberName.trim() || !memberEmail.trim() || !memberRole.trim() || isPending}
-            >
+            <Button type="submit" disabled={!selectedUserId || isPending}>
               {isPending ? 'Adding...' : 'Add Member'}
             </Button>
           </div>
