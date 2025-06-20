@@ -1,73 +1,95 @@
-# Welcome to your Lovable project
+# BugHost
 
-## Project info
+**BugHost** is a modern, collaborative bug tracking and project management system designed to streamline software development workflows for teams of all sizes. Built with React, Supabase, and Vite, BugHost empowers teams to efficiently manage issues, track progress, and coordinate project activities.
 
-**URL**: https://lovable.dev/projects/57a9685c-6490-4836-80cf-821eb11b3e10
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- **Kanban Issue Boards:** Visualize and manage issues using drag-and-drop Kanban boards.
+- **Team & Member Management:** Create teams, invite members, and assign roles (Project Manager, Developer, QA Engineer, etc.).
+- **Project Dashboard:** Get an overview of project status, recent activity, and key metrics.
+- **Role-Based Access Control:** Assign granular roles to team members.
+- **Real-Time Collaboration:** Updates are reflected instantly for all team members.
+- **Notifications & Toasts:** Receive instant feedback for important actions.
+- **Authentication & Security:** Secure login and user management.
+- **Customizable Workflows:** Adapt boards, statuses, and roles to fit your team’s process.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/57a9685c-6490-4836-80cf-821eb11b3e10) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend:** React, TypeScript, Vite, Radix UI, Lucide Icons, Tailwind CSS
+- **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **State Management:** React Query, Context API
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📦 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 1. Clone the Repository
 
-Follow these steps:
+```bash
+git clone https://github.com/your-username/bughost.git
+cd bughost
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 2. Install Dependencies
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 3. Configure Environment Variables
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Create a `.env` file in the project root and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_API_URL=your-api-url
+```
+
+### 4. Run the Development Server
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at [http://localhost:5173](http://localhost:5173) (or the port specified by Vite).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📚 Usage
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Create a Team:** Start by creating a new team and inviting members.
+- **Add Projects:** Organize your work into projects.
+- **Track Issues:** Use the Kanban board to create, assign, and track issues.
+- **Assign Roles:** Assign roles to team members for better access control.
+- **Collaborate:** Work together in real-time and get instant feedback via notifications.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 📝 Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Contributions are welcome! Please open issues or submit pull requests for improvements and bug fixes.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/57a9685c-6490-4836-80cf-821eb11b3e10) and click on Share -> Publish.
+## 📄 License
 
-## Can I connect a custom domain to my Lovable project?
+This project is licensed under the [MIT License](LICENSE).
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🙏 Acknowledgements
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- [Supabase](https://supabase.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Vite](https://vitejs.dev/)
+- [React Query](https://tanstack.com/query/latest)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+**BugHost** – Making bug tracking and project management simple,
