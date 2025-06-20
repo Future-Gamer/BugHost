@@ -92,4 +92,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**BugHost** – Making bug tracking and project management simple,
+**BugHost** – Making bug tracking and project management simple, collaborative, and effective.
