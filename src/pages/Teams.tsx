@@ -52,10 +52,10 @@ const TeamCard = ({ team, onDeleteClick }: { team: any; onDeleteClick: (team: { 
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => window.location.href = `/teams/${team.id}/members`}
-              >
-                View Members
+              <DropdownMenuItem asChild>
+                <Link to={`/teams/${team.id}/members`}>
+                  View Members
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
@@ -72,14 +72,13 @@ const TeamCard = ({ team, onDeleteClick }: { team: any; onDeleteClick: (team: { 
           </DropdownMenu>
         </div>
         
-        <CardTitle 
-          className="text-lg cursor-pointer hover:text-blue-600"
-          onClick={() => window.location.href = `/teams/${team.id}/members`}
-        >
-          {team.name}
-        </CardTitle>
+        <Link to={`/teams/${team.id}/members`}>
+          <CardTitle className="text-lg cursor-pointer hover:text-blue-600">
+            {team.name}
+          </CardTitle>
+        </Link>
         <CardDescription className="text-sm">
-          {team.description}
+          {team.description || 'No description provided'}
         </CardDescription>
       </CardHeader>
       
@@ -102,15 +101,19 @@ const TeamCard = ({ team, onDeleteClick }: { team: any; onDeleteClick: (team: { 
 };
 
 const Teams = () => {
-  const { data: teams, isLoading, error } = useTeams();
+  const { data: teams = [], isLoading, error } = useTeams();
   const deleteTeam = useDeleteTeam();
   const [showCreateTeam, setShowCreateTeam] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handleDeleteTeam = async () => {
     if (teamToDelete) {
-      await deleteTeam.mutateAsync(teamToDelete.id);
-      setTeamToDelete(null);
+      try {
+        await deleteTeam.mutateAsync(teamToDelete.id);
+        setTeamToDelete(null);
+      } catch (error) {
+        console.error('Error deleting team:', error);
+      }
     }
   };
 
@@ -178,7 +181,7 @@ const Teams = () => {
             </div>
           </div>
           <div className="text-center py-8">
-            <p className="text-red-600">Error loading teams. Please try again.</p>
+            <p className="text-red-600">Error loading teams: {error.message}</p>
           </div>
         </div>
       </div>
@@ -232,6 +235,13 @@ const Teams = () => {
             {teams?.length === 0 && (
               <div className="col-span-full text-center py-8">
                 <p className="text-gray-500">No teams found. Create your first team to get started.</p>
+                <Button 
+                  onClick={() => setShowCreateTeam(true)}
+                  className="mt-4"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Team
+                </Button>
               </div>
             )}
           </div>

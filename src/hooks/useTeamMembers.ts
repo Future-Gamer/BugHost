@@ -27,7 +27,10 @@ export const useTeamMembers = (teamId: string | null) => {
         .eq('team_id', teamId)
         .order('joined_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching team members:', error);
+        throw error;
+      }
       return (data || []) as TeamMemberWithProfile[];
     },
     enabled: !!teamId,
@@ -42,11 +45,21 @@ export const useAddTeamMember = () => {
     mutationFn: async (member: Omit<TeamMemberInsert, 'id' | 'joined_at'>) => {
       const { data, error } = await supabase
         .from('team_members')
-        .insert(member)
+        .insert({
+          team_id: member.team_id,
+          user_id: member.user_id || '', // Provide empty string as fallback
+          role: member.role,
+          status: member.status || 'pending',
+          member_name: member.member_name,
+          member_email: member.member_email,
+        })
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding team member:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -56,13 +69,13 @@ export const useAddTeamMember = () => {
         description: "Team member added successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Error adding team member:', error);
       toast({
         title: "Error",
-        description: "Failed to add team member",
+        description: error?.message || "Failed to add team member",
         variant: "destructive",
       });
-      console.error('Error adding team member:', error);
     },
   });
 };
@@ -80,19 +93,26 @@ export const useUpdateTeamMember = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating team member:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['team-members'] });
+      toast({
+        title: "Success",
+        description: "Team member updated successfully",
+      });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Error updating team member:', error);
       toast({
         title: "Error",
-        description: "Failed to update team member",
+        description: error?.message || "Failed to update team member",
         variant: "destructive",
       });
-      console.error('Error updating team member:', error);
     },
   });
 };
@@ -126,13 +146,13 @@ export const useRemoveTeamMember = () => {
         description: "Team member removed successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Error removing team member:', error);
       toast({
         title: "Error",
-        description: "Failed to remove team member",
+        description: error?.message || "Failed to remove team member",
         variant: "destructive",
       });
-      console.error('Error removing team member:', error);
     },
   });
 };
