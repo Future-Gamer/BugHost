@@ -197,11 +197,9 @@ const Sidebar = React.forwardRef<
             data-sidebar="sidebar"
             data-mobile="true"
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              } as any
-            }
+            {...({ style: {
+              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+            } } as any)}
             side={side}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
