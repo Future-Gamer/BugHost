@@ -52,15 +52,14 @@ const TeamCard = ({ team, onDeleteClick }: { team: any; onDeleteClick: (team: { 
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to={`/teams/${team.id}/members`}>
+              <DropdownMenuItem>
+                <Link to={`/teams/${team.id}/members`} className="flex items-center w-full">
                   View Members
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   onDeleteClick({ id: team.id, name: team.name });
                 }}
                 className="text-red-600"

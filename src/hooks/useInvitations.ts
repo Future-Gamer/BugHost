@@ -1,12 +1,46 @@
+import { supabase } from "@/integrations/supabase/client";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
+// Helper functions to map between role types
+const mapRoleToUserRole = (role: string): Database['public']['Enums']['user_role'] => {
+  const roleMap: Record<string, Database['public']['Enums']['user_role']> = {
+    'admin': 'Admin',
+    'manager': 'Program Manager',
+    'developer': 'Developer',
+    'tester': 'Tester'
+  };
+  return roleMap[role] || 'Developer';
+};
 
-type Invitation = Tables<'invitations'>;
-type InvitationInsert = TablesInsert<'invitations'>;
-type InvitationUpdate = TablesUpdate<'invitations'>;
+const mapUserRoleToTeamRole = (role: Database['public']['Enums']['user_role']): Database['public']['Enums']['user_role_1'] => {
+  const roleMap: Record<Database['public']['Enums']['user_role'], Database['public']['Enums']['user_role_1']> = {
+    'Admin': 'admin',
+    'Program Manager': 'manager',
+    'Developer': 'developer',
+    'Tester': 'tester',
+    'Project Manager': 'manager',
+    'Tech Lead': 'admin',
+    'Frontend Developer': 'developer',
+    'Backend Developer': 'developer',
+    'Full Stack Developer': 'developer',
+    'QA Engineer': 'tester',
+    'DevOps Engineer': 'developer',
+    'Database Administrator  (DBA)': 'developer',
+    'Business Analyst': 'manager',
+    'Scrum Master': 'manager',
+    'Content Writer / Copywriter': 'developer',
+    'Security Engineer': 'developer',
+    'Data Analyst': 'developer',
+    'Project Coordinator': 'manager'
+  };
+  return roleMap[role] || 'developer';
+};
+
+type Invitation = Database['public']['Tables']['invitations']['Row'];
+type InvitationInsert = Database['public']['Tables']['invitations']['Insert'];
+type InvitationUpdate = Database['public']['Tables']['invitations']['Update'];
 
 export const useTeamInvitations = (teamId: string | null) => {
   return useQuery({
@@ -46,7 +80,7 @@ export const useCreateInvitation = () => {
         .insert({
           team_id: invitation.teamId,
           email: invitation.email,
-          role: invitation.role,
+          role: mapRoleToUserRole(invitation.role),
           invited_by: invitation.invitedBy,
           token: token,
         })
@@ -133,7 +167,7 @@ export const useAcceptInvitation = () => {
         .insert({
           team_id: invitation.team_id,
           user_id: (await supabase.auth.getUser()).data.user?.id,
-          role: invitation.role,
+          role: mapUserRoleToTeamRole(invitation.role),
           status: 'active',
         });
       

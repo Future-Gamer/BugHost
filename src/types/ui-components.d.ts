@@ -1,4 +1,3 @@
-
 // This file ensures proper typing for UI components
 declare global {
   namespace JSX {
@@ -192,6 +191,7 @@ declare module '@radix-ui/react-dropdown-menu' {
   interface DropdownMenuItemProps {
     children?: React.ReactNode;
     className?: string;
+    asChild?: boolean;
   }
   
   interface DropdownMenuCheckboxItemProps {
@@ -358,6 +358,7 @@ declare module '@radix-ui/react-progress' {
   interface ProgressIndicatorProps {
     children?: React.ReactNode;
     className?: string;
+    style?: React.CSSProperties;
   }
 }
 
@@ -454,11 +455,30 @@ declare module '@radix-ui/react-select' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface SelectIconProps {
+    children?: React.ReactNode;
+    className?: string;
+    asChild?: boolean;
+  }
+  
+  interface SelectViewportProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-separator' {
   interface SeparatorProps {
     className?: string;
+  }
+}
+
+declare module '@radix-ui/react-sheet' {
+  interface SheetContentProps {
+    children?: React.ReactNode;
+    className?: string;
+    style?: any;
   }
 }
 
@@ -511,6 +531,11 @@ declare module '@radix-ui/react-tabs' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface TabsProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-toast' {
@@ -538,6 +563,11 @@ declare module '@radix-ui/react-toast' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface ToastViewportProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-toggle' {
@@ -557,12 +587,29 @@ declare module '@radix-ui/react-toggle-group' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface ToggleGroupSingleProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ToggleGroupMultipleProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-tooltip' {
   interface TooltipContentProps {
     children?: React.ReactNode;
     className?: string;
+    hidden?: boolean;
+  }
+  
+  interface TooltipTriggerProps {
+    children?: React.ReactNode;
+    className?: string;
+    asChild?: boolean;
   }
 }
 
@@ -575,6 +622,7 @@ declare module 'vaul' {
   interface DialogContentProps {
     children?: React.ReactNode;
     className?: string;
+    style?: any;
   }
 }
 
@@ -582,6 +630,7 @@ declare module 'cmdk' {
   interface CommandProps {
     children?: React.ReactNode;
     className?: string;
+    [key: string]: any;
   }
 }
 
