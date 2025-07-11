@@ -1,5 +1,4 @@
 
-
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
@@ -43,7 +42,8 @@ const ChartContainer = React.forwardRef<
     >["children"]
   }
 >(({ id, className, children, config, ...props }, ref) => {
-  const uniqueId = React.useId ? React.useId() : `chart-${Math.random().toString(36).substr(2, 9)}`
+  // Use a simple random ID for compatibility
+  const uniqueId = `chart-${Math.random().toString(36).substr(2, 9)}`
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
   return (
@@ -227,7 +227,7 @@ const ChartTooltipContent = React.forwardRef<
                             {
                               "--color-bg": indicatorColor,
                               "--color-border": indicatorColor,
-                            } as React.CSSProperties
+                            } as { [key: string]: string }
                           }
                         />
                       )
@@ -369,4 +369,3 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
-

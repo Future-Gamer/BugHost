@@ -74,7 +74,8 @@ const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const id = React.useId()
+  // Use a simple random ID for compatibility
+  const id = `form-item-${Math.random().toString(36).substr(2, 9)}`
 
   return (
     <FormItemContext.Provider value={{ id }}>

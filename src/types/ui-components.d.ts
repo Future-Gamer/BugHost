@@ -1,5 +1,4 @@
 
-
 // This file ensures proper typing for UI components
 declare global {
   namespace JSX {
@@ -139,6 +138,15 @@ declare module '@radix-ui/react-context-menu' {
 }
 
 declare module '@radix-ui/react-dialog' {
+  interface DialogProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface DialogOverlayProps {
+    className?: string;
+  }
+  
   interface DialogContentProps {
     children?: React.ReactNode;
     className?: string;
@@ -153,9 +161,19 @@ declare module '@radix-ui/react-dialog' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface DialogCloseProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-dropdown-menu' {
+  interface DropdownMenuTriggerProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
   interface DropdownMenuSubTriggerProps {
     children?: React.ReactNode;
     className?: string;
@@ -222,6 +240,16 @@ declare module '@radix-ui/react-label' {
 }
 
 declare module '@radix-ui/react-menubar' {
+  interface MenubarProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface MenubarTriggerProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
   interface MenubarSubTriggerProps {
     children?: React.ReactNode;
     className?: string;
@@ -273,6 +301,16 @@ declare module '@radix-ui/react-menubar' {
 }
 
 declare module '@radix-ui/react-navigation-menu' {
+  interface NavigationMenuProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface NavigationMenuListProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
   interface NavigationMenuContentProps {
     children?: React.ReactNode;
     className?: string;
@@ -292,10 +330,76 @@ declare module '@radix-ui/react-navigation-menu' {
     children?: React.ReactNode;
     className?: string;
   }
+  
+  interface NavigationMenuIndicatorProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface NavigationMenuViewportProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
 }
 
 declare module '@radix-ui/react-popover' {
   interface PopoverContentProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-progress' {
+  interface ProgressProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ProgressIndicatorProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-radio-group' {
+  interface RadioGroupProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface RadioGroupItemProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface RadioGroupIndicatorProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-scroll-area' {
+  interface ScrollAreaProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ScrollAreaViewportProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ScrollAreaScrollbarProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ScrollAreaThumbProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ScrollAreaCornerProps {
     children?: React.ReactNode;
     className?: string;
   }
@@ -352,6 +456,46 @@ declare module '@radix-ui/react-select' {
   }
 }
 
+declare module '@radix-ui/react-separator' {
+  interface SeparatorProps {
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-slider' {
+  interface SliderProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface SliderTrackProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface SliderRangeProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface SliderThumbProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-switch' {
+  interface SwitchProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface SwitchThumbProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
 declare module '@radix-ui/react-tabs' {
   interface TabsListProps {
     children?: React.ReactNode;
@@ -396,6 +540,25 @@ declare module '@radix-ui/react-toast' {
   }
 }
 
+declare module '@radix-ui/react-toggle' {
+  interface ToggleProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+declare module '@radix-ui/react-toggle-group' {
+  interface ToggleGroupProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface ToggleGroupItemProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
 declare module '@radix-ui/react-tooltip' {
   interface TooltipContentProps {
     children?: React.ReactNode;
@@ -403,5 +566,23 @@ declare module '@radix-ui/react-tooltip' {
   }
 }
 
-export {};
+declare module 'vaul' {
+  interface DialogOverlayProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+  
+  interface DialogContentProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
 
+declare module 'cmdk' {
+  interface CommandProps {
+    children?: React.ReactNode;
+    className?: string;
+  }
+}
+
+export {};
