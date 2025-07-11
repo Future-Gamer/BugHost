@@ -1,10 +1,9 @@
 
+// Extend lucide-react types to include className without overriding exports
+import { LucideProps } from 'lucide-react';
+
 declare module 'lucide-react' {
-  import { LucideProps as OriginalLucideProps } from 'lucide-react';
-  
-  export interface LucideProps extends OriginalLucideProps {
+  interface LucideProps {
     className?: string;
   }
-  
-  export * from 'lucide-react';
 }
